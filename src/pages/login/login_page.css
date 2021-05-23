@@ -1,0 +1,34 @@
+.loginWelcome {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: inherit;
+  overflow: auto;
+}
+
+.loginWelcome__header {
+  position: relative;
+  z-index: 10;
+}
+
+.loginWelcome__logo {
+
+}
+
+.loginWelcome__logo img {
+  filter: invert(1);
+}
+
+.loginWelcome__content {
+  position: relative;
+  margin: auto;
+  max-width: 460px;
+  z-index: 10;
+}
+
+.loginWelcome__content .loginWelcome__contentDisabledForm {
+  max-width: 700px;
+}
