@@ -10,20 +10,19 @@ import {
     EuiPanel,
     EuiSpacer,
     EuiText,
-} from '@elastic/eui';
-import type { ChangeEvent, FormEvent, MouseEvent } from 'react';
-import React, { Component, Fragment } from 'react';
+} from "@elastic/eui";
+import type { ChangeEvent, FormEvent, MouseEvent } from "react";
+import React, { Component, Fragment } from "react";
 
-import { LoginValidator } from '../helpers/login_validator';
-import {delay} from "../../../utils/delay";
+import { LoginValidator } from "../helpers/login_validator";
+import { delay } from "../../../utils/delay";
 
 interface Props {
-    onSuccessAuth?: () => void
+    onSuccessAuth?: () => void;
 }
 
 interface State {
-    loadingState:
-        | { type: LoadingStateType.None | LoadingStateType.Form }
+    loadingState: { type: LoadingStateType.None | LoadingStateType.Form };
     username: string;
     password: string;
     message:
@@ -52,7 +51,6 @@ export enum PageMode {
 export class LoginForm extends Component<Props, State> {
     private readonly validator: LoginValidator;
 
-
     constructor(props: Props) {
         super(props);
         this.validator = new LoginValidator({ shouldValidate: false });
@@ -61,8 +59,8 @@ export class LoginForm extends Component<Props, State> {
 
         this.state = {
             loadingState: { type: LoadingStateType.None },
-            username: '',
-            password: '',
+            username: "",
+            password: "",
             message: { type: MessageType.None },
             mode,
             previousMode: mode,
@@ -135,7 +133,6 @@ export class LoginForm extends Component<Props, State> {
                             autoComplete="off"
                             id="username"
                             name="username"
-                            data-test-subj="loginUsername"
                             value={this.state.username}
                             onChange={this.onUsernameChange}
                             disabled={!this.isLoadingState(LoadingStateType.None)}
@@ -154,7 +151,7 @@ export class LoginForm extends Component<Props, State> {
                             id="password"
                             name="password"
                             data-test-subj="loginPassword"
-                            type={'dual'}
+                            type={"dual"}
                             value={this.state.password}
                             onChange={this.onPasswordChange}
                             disabled={!this.isLoadingState(LoadingStateType.None)}
@@ -165,7 +162,12 @@ export class LoginForm extends Component<Props, State> {
 
                     <EuiSpacer />
 
-                    <EuiFlexGroup responsive={false} alignItems="center" gutterSize="s" justifyContent="spaceAround">
+                    <EuiFlexGroup
+                        responsive={false}
+                        alignItems="center"
+                        gutterSize="s"
+                        justifyContent="spaceAround"
+                    >
                         <EuiFlexItem grow={false}>
                             <EuiButton
                                 fill
@@ -188,12 +190,8 @@ export class LoginForm extends Component<Props, State> {
     private renderLoginHelp = () => {
         return (
             <EuiPanel data-test-subj="loginHelp">
-                <EuiText>
-                    Логин для входа admin
-                </EuiText>
-                <EuiText>
-                    Пароль 12345678
-                </EuiText>
+                <EuiText>Логин для входа admin</EuiText>
+                <EuiText>Пароль 12345678</EuiText>
             </EuiPanel>
         );
     };
@@ -237,7 +235,11 @@ export class LoginForm extends Component<Props, State> {
     }
 
     private onPageModeChange = (mode: PageMode) => {
-        this.setState({ message: { type: MessageType.None }, mode, previousMode: this.state.mode });
+        this.setState({
+            message: { type: MessageType.None },
+            mode,
+            previousMode: this.state.mode,
+        });
     };
 
     private onUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -272,22 +274,41 @@ export class LoginForm extends Component<Props, State> {
         await delay();
 
         try {
-            this.setState({
-                loadingState: { type: LoadingStateType.None },
-                message: { type: MessageType.Info, content: 'Вы успешно вошли' },
+
+
+            const d = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username,
+                    password
+                }),
             });
 
-            await delay(500);
+            const json = await d.json();
 
-            if (this.props.onSuccessAuth) {
-                this.props.onSuccessAuth()
+
+            if (json && json?.success) {
+                if (this.props.onSuccessAuth) {
+                    this.setState({
+                        loadingState: { type: LoadingStateType.None },
+                        message: { type: MessageType.Info, content: "Вы успешно вошли" },
+                    });
+                    this.props.onSuccessAuth();
+                }
+            } else {
+                this.setState({
+                    message: { type: MessageType.Danger, content: "Некорректный логин или пароль" },
+                    loadingState: { type: LoadingStateType.None },
+                });
             }
 
+
         } catch (error) {
-            const message =
-                (error).response?.status === 401
-                    ? "Некорректный логин или пароль"
-                    : "Ошибка! Что-то пошло не так"
+            const message = "Ошибка! Что-то пошло не так";
 
             this.setState({
                 message: { type: MessageType.Danger, content: message },

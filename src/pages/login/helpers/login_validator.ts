@@ -28,7 +28,7 @@ export class LoginValidator {
         }
 
         if (!username) {
-            return invalid('Требуется логин');
+            return invalid("Требуется логин");
         }
 
         return valid();
@@ -40,12 +40,15 @@ export class LoginValidator {
         }
 
         if (!password) {
-            return invalid('Требуется пароль');
+            return invalid("Требуется пароль");
         }
         return valid();
     }
 
-    public validateForLogin(username: string, password: string): LoginValidationResult {
+    public validateForLogin(
+        username: string,
+        password: string
+    ): LoginValidationResult {
         const { isInvalid: isUsernameInvalid } = this.validateUsername(username);
         const { isInvalid: isPasswordInvalid } = this.validatePassword(password);
 

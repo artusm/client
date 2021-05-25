@@ -1,0 +1,85 @@
+.mlFieldDataCard {
+    height: 420px;
+    box-shadow: none;
+    border-color: #D3DAE6;
+}
+
+
+
+.ml-field-title-bar {
+    font-size: 18px;
+    font-size: 1.125rem;
+    line-height: 1.5;
+    font-family: Roboto Mono, serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    border-radius: 4px 4px 0 0;
+    padding: 4px;
+    margin: -16px -16px 0 -16px;
+    border-top: 3px solid;
+    border-top-color: currentcolor;
+    text-align: center;
+}
+
+.mlFieldDataCard .keyword .field-type-icon-container {
+    background-color: rgba(84, 179, 153, 0.2);
+}
+
+.field-type-icon-container {
+    display: inline-block !important;
+    vertical-align: middle;
+    border: 1px solid;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.ml-field-title-bar .field-name {
+    max-width: 100%;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    vertical-align: middle;
+    padding-right: 8px;
+    max-width: 290px;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.mlFieldDataCard .mlFieldDataCard__content {
+    font-size: 14px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    height: 385px;
+    overflow: hidden;
+}
+
+.mlFieldDataCard .mlFieldDataCard__stats {
+    padding: 8px 8px 0px 8px;
+    text-align: center;
+}
+
+.mlFieldDataCard .text {
+    color: #E7664C;
+    border-color: #E7664C;
+}
+
+.mlFieldDataCard .number {
+    color: #6092C0;
+    border-color: #6092C0;
+}
+
+.mlFieldDataCard .keyword {
+    color: #54B399;
+    border-color: #54B399;
+}
+
+.mlFieldDataCard .date {
+    color: #DA8B45;
+    border-color: #DA8B45;
+}
