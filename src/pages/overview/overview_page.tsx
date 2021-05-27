@@ -35,7 +35,7 @@ const OverviewPage = () => {
             <EuiPage paddingSize="none">
                 <EuiPageBody panelled>
                     <EuiPageHeader
-                        iconType="dashboardApp"
+                        iconType="discoverApp"
                         pageTitle="Главная"
                         description={`Сегодня ${moment().format("MM.DD.YYYY HH:mm ")}`}
                     />
@@ -154,12 +154,13 @@ const OverviewPage = () => {
                                 <EuiFlexItem>
                                     <EuiPanel>
                                         <EuiStat
-                                            title={humanNumber(data?.driverCount)}
-                                            description="Логи с типом driver"
+                                            title={humanNumber(data?.anomalyCount)}
+                                            description="Логи с аномалиями"
                                             textAlign="right"
+                                            titleColor="warning"
                                             isLoading={isLoading}
                                         >
-                                            <EuiIcon type="empty" />
+                                            <EuiIcon type="alert" color="warning" />
                                         </EuiStat>
                                     </EuiPanel>
                                 </EuiFlexItem>

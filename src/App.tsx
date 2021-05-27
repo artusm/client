@@ -11,6 +11,8 @@ import {UserListPage} from "./pages/user-list";
 import {NewUserPage} from "./pages/create-new-user";
 import FieldDataVisualizerPage from "./pages/field-datavisualizer/field-datavisualizer_page";
 import {EditUserPage} from "./pages/edit-user";
+import {StatPage} from "./pages/stat";
+import {TempMonitoringPage} from "./pages/temp-monitoring";
 
 function App() {
     return (
@@ -22,6 +24,8 @@ function App() {
                 <Route path="/users/new" exact={true} component={NewUserPage} />
                 <Route path="/users/:username" exact={true} component={EditUserPage} />
                 <Route path={"/field-stats"} exact={true} component={FieldDataVisualizerPage} />
+                <Route path="/stat" exact={true} component={StatPage} />
+                <Route path="/temp-stat" exact={true} component={TempMonitoringPage} />
             </Switch>
         </Router>
     );

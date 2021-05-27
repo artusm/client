@@ -4,8 +4,6 @@ import { useCallback, useMemo } from 'react';
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50];
 
-// Copying from EUI EuiBasicTable types as type is not correctly picked up for table's onChange
-// Can be removed when https://github.com/elastic/eui/issues/4011 is addressed in EUI
 export interface Criteria<T> {
     page?: {
         index: number;

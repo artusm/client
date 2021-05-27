@@ -22,9 +22,10 @@ export function makeServer({ environment = "development" } = {}) {
         routes() {
             this.namespace = "api";
             this.timing = 750;
+            this.urlPrefix = 'http://localhost:3000'
 
             this.get("/stats", () => {
-                return {totalCount: 4020916, errorCount: 402, rayCount: 1762763, driverCount: 1947878, accessCount: 310275, newForHour: 1231, newForDay: 574123,}
+                return {totalCount: 4020916, errorCount: 402, rayCount: 1762763, driverCount: 1947878, accessCount: 310275, newForHour: 1231, newForDay: 574123, anomalyCount: 3}
             });
 
             this.get("/field-stats", () => {
@@ -738,6 +739,35 @@ export function makeServer({ environment = "development" } = {}) {
                 return {success: false}
             });
 
+            this.get("/anomaly-logs", ({db}) => {
+                return [
+                    {
+                        description: "Пустой статус",
+                        timestamp: "2021-05-23T06:50:00.000Z",
+                        criticLevel: 3,
+                        log: {
+                            message: "ESL 2000003463534 Status {}"
+                        }
+                    },
+                    {
+                        description: "Пустой статус",
+                        timestamp: "2021-05-23T06:50:00.000Z",
+                        criticLevel: 3,
+                        log: {
+                            message: "ESL 2000003463534 Status {}"
+                        }
+                    },
+                    {
+                        description: "Пустой статус",
+                        timestamp: "2021-05-23T06:50:00.000Z",
+                        criticLevel: 3,
+                        log: {
+                            message: "ESL 2000003463534 Status {}"
+                        }
+                    },
+                ]
+            })
+
             this.put("/users/:id", ({db}, request) => {
                 let user = JSON.parse(request.requestBody);
 
@@ -756,3 +786,5 @@ export function makeServer({ environment = "development" } = {}) {
 
     return server;
 }
+
+export default makeServer();

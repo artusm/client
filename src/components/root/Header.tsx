@@ -182,7 +182,7 @@ const HeaderAppMenu = () => {
                     // @ts-ignore
                     onClick={onClick}
                 >
-                    <EuiIcon type="dashboardApp" size="l" />
+                    <EuiIcon type="discoverApp" size="l" />
                 </EuiKeyPadMenuItem>
 
                 <EuiKeyPadMenuItem
@@ -213,7 +213,18 @@ const HeaderAppMenu = () => {
                 </EuiKeyPadMenuItem>
 
                 <EuiKeyPadMenuItem
-                    label="Visualize"
+                    label="Мониторинг температуры ценников"
+                    data-url="/temp-stat"
+                    // @ts-ignore
+                    onClick={onClick}
+                >
+                    <EuiIcon type="monitoringApp" size="l" />
+                </EuiKeyPadMenuItem>
+                <EuiKeyPadMenuItem
+                    label="Статистика темпа добавления логов"
+                    data-url="/stat"
+                    // @ts-ignore
+                    onClick={onClick}
                 >
                     <EuiIcon type="visualizeApp" size="l" />
                 </EuiKeyPadMenuItem>
