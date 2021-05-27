@@ -1,5 +1,5 @@
-import React  from "react";
-import Header from "../../components/root/Header";
+import React, { useEffect, useState } from 'react';
+import Header from '../../components/root/Header';
 import {
     EuiPage,
     EuiPageContent,
@@ -11,24 +11,64 @@ import {
     EuiFlexGroup,
     EuiPanel,
     EuiIcon,
-} from "@elastic/eui";
-import { humanNumber } from "../../utils/human-number";
-import useSWR from "swr";
-import moment from "moment";
+} from '@elastic/eui';
+import { humanNumber } from '../../utils/human-number';
+import moment from 'moment';
+import { loadErrorCount, loadLogTypeCounts } from '../../query/overview';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+interface Counters {
+    total: number;
+    ray: number;
+    access: number;
+    driver: number;
+    error: number;
+}
+
+const initialCounterState: Counters = {
+    total: 0,
+    access: 0,
+    ray: 0,
+    driver: 0,
+    error: 0,
+};
+
+const useCounterData = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [counters, setCounters] = useState<Counters>(initialCounterState);
+
+    useEffect(() => {
+        const load = async () => {
+            setIsLoading(true);
+            const data = await loadLogTypeCounts();
+            const errorCount = await loadErrorCount();
+
+            setCounters({
+                ...counters,
+                ...data,
+                error: errorCount,
+            });
+
+            setIsLoading(false);
+        };
+
+        load();
+    }, []);
+
+    return {
+        counters,
+        isLoading,
+    };
+};
 
 const OverviewPage = () => {
-    const { data } = useSWR("/api/stats", fetcher);
-
-    const isLoading = !data;
+    const { counters, isLoading } = useCounterData();
 
     return (
         <>
             <Header
                 breadcrumbs={[
                     {
-                        text: "Главная",
+                        text: 'Главная',
                     },
                 ]}
             />
@@ -37,7 +77,7 @@ const OverviewPage = () => {
                     <EuiPageHeader
                         iconType="discoverApp"
                         pageTitle="Главная"
-                        description={`Сегодня ${moment().format("MM.DD.YYYY HH:mm ")}`}
+                        description={`Сегодня ${moment().format('MM.DD.YYYY HH:mm ')}`}
                     />
 
                     <EuiPageContent
@@ -52,7 +92,7 @@ const OverviewPage = () => {
                                 <EuiFlexItem>
                                     <EuiPanel>
                                         <EuiStat
-                                            title={humanNumber(data?.totalCount)}
+                                            title={humanNumber(counters.total)}
                                             description="Всего логов"
                                             textAlign="right"
                                             isLoading={isLoading}
@@ -64,7 +104,7 @@ const OverviewPage = () => {
                                 <EuiFlexItem>
                                     <EuiPanel>
                                         <EuiStat
-                                            title={humanNumber(data?.totalCount - data?.errorCount)}
+                                            title={humanNumber(counters.total - counters.error)}
                                             description="Логи без ошибок"
                                             titleColor="secondary"
                                             textAlign="right"
@@ -77,7 +117,7 @@ const OverviewPage = () => {
                                 <EuiFlexItem>
                                     <EuiPanel>
                                         <EuiStat
-                                            title={humanNumber(data?.errorCount)}
+                                            title={humanNumber(counters.error)}
                                             description="Логи с ошибками"
                                             titleColor="danger"
                                             textAlign="right"
@@ -92,7 +132,7 @@ const OverviewPage = () => {
                                 <EuiFlexItem>
                                     <EuiPanel>
                                         <EuiStat
-                                            title={humanNumber(data?.rayCount)}
+                                            title={humanNumber(counters.ray)}
                                             description="Логи с типом ray"
                                             textAlign="right"
                                             isLoading={isLoading}
@@ -104,7 +144,7 @@ const OverviewPage = () => {
                                 <EuiFlexItem>
                                     <EuiPanel>
                                         <EuiStat
-                                            title={humanNumber(data?.accessCount)}
+                                            title={humanNumber(counters.access)}
                                             description="Логи с типом access"
                                             textAlign="right"
                                             isLoading={isLoading}
@@ -116,51 +156,12 @@ const OverviewPage = () => {
                                 <EuiFlexItem>
                                     <EuiPanel>
                                         <EuiStat
-                                            title={humanNumber(data?.driverCount)}
+                                            title={humanNumber(counters.driver)}
                                             description="Логи с типом driver"
                                             textAlign="right"
                                             isLoading={isLoading}
                                         >
                                             <EuiIcon type="empty" />
-                                        </EuiStat>
-                                    </EuiPanel>
-                                </EuiFlexItem>
-                            </EuiFlexGroup>
-                            <EuiFlexGroup>
-                                <EuiFlexItem>
-                                    <EuiPanel>
-                                        <EuiStat
-                                            title={humanNumber(data?.newForHour)}
-                                            description="Новых логов за час"
-                                            textAlign="right"
-                                            isLoading={isLoading}
-                                        >
-                                            <EuiIcon type="empty" />
-                                        </EuiStat>
-                                    </EuiPanel>
-                                </EuiFlexItem>
-                                <EuiFlexItem>
-                                    <EuiPanel>
-                                        <EuiStat
-                                            title={humanNumber(data?.newForDay)}
-                                            description="Новых логов за день"
-                                            textAlign="right"
-                                            isLoading={isLoading}
-                                        >
-                                            <EuiIcon type="empty" />
-                                        </EuiStat>
-                                    </EuiPanel>
-                                </EuiFlexItem>
-                                <EuiFlexItem>
-                                    <EuiPanel>
-                                        <EuiStat
-                                            title={humanNumber(data?.anomalyCount)}
-                                            description="Логи с аномалиями"
-                                            textAlign="right"
-                                            titleColor="warning"
-                                            isLoading={isLoading}
-                                        >
-                                            <EuiIcon type="alert" color="warning" />
                                         </EuiStat>
                                     </EuiPanel>
                                 </EuiFlexItem>

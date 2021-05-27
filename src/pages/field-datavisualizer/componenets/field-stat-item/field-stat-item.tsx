@@ -12,18 +12,19 @@ import {DocumentsCount} from "./documents-count";
 import {DistinctValues} from "./distinct-values";
 import {NumberStat} from "./number-stat";
 import {ExampleList} from "./ExampleList";
-import {TopValue, TopValues} from "../TopValues";
+import {IndexBasedNumberContentPreview, TopValue, TopValues} from "../TopValues";
 
 interface FieldStatData {
     count?: number;
-    distinctCount?: number;
+    cardinality?: number;
     examples?: string[];
     min?: number;
     max?: number;
     avg?: number;
     topValues?: TopValue[];
     earliest?: number;
-    latest?: number
+    latest?: number;
+    distribution: any
 }
 
 interface FieldStatItemProps {
@@ -47,7 +48,7 @@ export const FieldStatItem: FC<FieldStatItemProps> = ({
                 <FieldHeader type={type} fieldName={fieldName} />
                 <div className={"mlFieldDataCard__content"}>
                     <div className={"mlFieldDataCard__stats"}>
-                        {getBody(type, totalCount, data)}
+                        {getBody(type, totalCount, data, fieldName)}
                     </div>
                 </div>
             </EuiPanel>
@@ -55,7 +56,7 @@ export const FieldStatItem: FC<FieldStatItemProps> = ({
     );
 };
 
-function getBody(type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES], totalCount: number, data?: FieldStatData) {
+function getBody(type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES], totalCount: number, data?: FieldStatData, fieldName?: string) {
     if (type === 'date')
         return (
             <>
@@ -71,8 +72,8 @@ function getBody(type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES], totalCount:
     return (
         <>
             <DocumentsCount count={data?.count} totalCount={totalCount} />
-            <DistinctValues distinctCount={data?.distinctCount} />
-            {type === 'number' && (data && ('avg' in data || 'min' in data || 'max' in data))  && <NumberStat avg={data?.avg} max={data?.max} min={data?.min} />}
+            <DistinctValues distinctCount={data?.cardinality} />
+            {type === 'number' && (data && (data.avg || data.min || data.max))  && <NumberStat avg={data?.avg} max={data?.max} min={data?.min} />}
             {data?.topValues && <TopValues topValues={data?.topValues} count={data.count} barColor={getColor(type)} />}
         </>
     )

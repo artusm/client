@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
-import Header from "../../components/root/Header";
-import { mutate } from "swr";
+import React, { useState, useMemo } from 'react';
+import Header from '../../components/root/Header';
+import { mutate } from 'swr';
 import {
     EuiPage,
     EuiPageContent,
@@ -15,10 +15,10 @@ import {
     EuiHealth,
     EuiSuperSelect,
     EuiFieldText,
-    EuiComboBox
-} from "@elastic/eui";
-import { useForm } from "react-hook-form";
-import { useHistory } from "react-router";
+    EuiComboBox,
+} from '@elastic/eui';
+import { useForm } from 'react-hook-form';
+import { useHistory } from 'react-router';
 
 const NewUserPage = () => {
     return (
@@ -26,10 +26,10 @@ const NewUserPage = () => {
             <Header
                 breadcrumbs={[
                     {
-                        text: "Список пользователей",
+                        text: 'Список пользователей',
                     },
                     {
-                        text: "Создание нового пользователя",
+                        text: 'Создание нового пользователя',
                     },
                 ]}
             />
@@ -60,17 +60,17 @@ const NewUserPage = () => {
 
 const options = [
     {
-        value: "true",
+        value: 'true',
         inputDisplay: (
-            <EuiHealth color="success" style={{ lineHeight: "inherit" }}>
+            <EuiHealth color="success" style={{ lineHeight: 'inherit' }}>
                 Активен
             </EuiHealth>
         ),
     },
     {
-        value: "false",
+        value: 'false',
         inputDisplay: (
-            <EuiHealth color="danger" style={{ lineHeight: "inherit" }}>
+            <EuiHealth color="danger" style={{ lineHeight: 'inherit' }}>
                 Диактивен
             </EuiHealth>
         ),
@@ -93,11 +93,11 @@ const accessOptions = [
     {
         label: 'Доступ к списку пользователей',
         value: 'user_list',
-    }
-]
+    },
+];
 
 const NewUserForm = () => {
-    const [enabled, setEnabled] = useState("true");
+    const [enabled, setEnabled] = useState('true');
     const [accesses, setAccesses] = useState([]);
     const { register, formState, handleSubmit } = useForm();
     const [isLoading, setIsLoading] = useState(false);
@@ -106,14 +106,14 @@ const NewUserForm = () => {
     const onSubmit = async ({ email, username, password, full_name }) => {
         setIsLoading(true);
 
-        const data = await fetch("/api/users", {
-            method: "POST",
+        const data = await fetch('/api/users', {
+            method: 'POST',
             headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                enabled: enabled === "true",
+                enabled: enabled === 'true',
                 email,
                 username,
                 password,
@@ -125,7 +125,7 @@ const NewUserForm = () => {
         setIsLoading(false);
         const json: any = await data.json();
         if (json.created) {
-            mutate("/api/users");
+            mutate('/api/users');
             history.push(`/users/${json.user.username}`);
         } else if (json.errors) {
         }
@@ -162,25 +162,25 @@ const NewUserForm = () => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.username}
-                    icon={"user"}
-                    {...register("username", {
+                    icon={'user'}
+                    {...register('username', {
                         required: {
                             value: true,
-                            message: "Поле с именем пользователя не может быть пустым",
+                            message: 'Поле с именем пользователя не может быть пустым',
                         },
                         minLength: {
                             value: 5,
                             message:
-                                "Минимальная длина поля с именем пользователя 5 символов",
+                                'Минимальная длина поля с именем пользователя 5 символов',
                         },
                         maxLength: {
                             value: 20,
                             message:
-                                "Максимальная длина поля с именем пользователя 20 символов",
+                                'Максимальная длина поля с именем пользователя 20 символов',
                         },
                         pattern: {
                             value: /^[A-Za-z0-9]+$/,
-                            message: "Только символы и цифры",
+                            message: 'Только символы и цифры',
                         },
                     })}
                 />
@@ -188,8 +188,8 @@ const NewUserForm = () => {
             <EuiFormRow label="Имя">
                 <EuiFieldText
                     disabled={isLoading}
-                    icon={"user"}
-                    {...register("full_name")}
+                    icon={'user'}
+                    {...register('full_name')}
                 />
             </EuiFormRow>
             <EuiFormRow
@@ -200,15 +200,15 @@ const NewUserForm = () => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.email}
-                    icon={"email"}
-                    {...register("email", {
+                    icon={'email'}
+                    {...register('email', {
                         required: {
                             value: true,
-                            message: "Поле с почтой не может быть пустым",
+                            message: 'Поле с почтой не может быть пустым',
                         },
                         pattern: {
                             value: /\S+@\S+\.\S+/,
-                            message: "Некорректная почта",
+                            message: 'Некорректная почта',
                         },
                     })}
                 />
@@ -224,16 +224,16 @@ const NewUserForm = () => {
                     autoComplete="off"
                     isInvalid={!!errors.password}
                     id="password"
-                    type={"dual"}
+                    type={'dual'}
                     aria-required={true}
-                    {...register("password", {
+                    {...register('password', {
                         required: {
                             value: true,
-                            message: "Поле с паролем не может быть пустым",
+                            message: 'Поле с паролем не может быть пустым',
                         },
                         minLength: {
                             value: 5,
-                            message: "Минимальная длина поля с именем паролем 5 символов",
+                            message: 'Минимальная длина поля с именем паролем 5 символов',
                         },
                     })}
                 />
@@ -263,7 +263,7 @@ const NewUserForm = () => {
             </EuiFormRow>
             <EuiSpacer />
 
-            <EuiButton type={"submit"} isLoading={isLoading}>
+            <EuiButton type={'submit'} isLoading={isLoading}>
                 Создать
             </EuiButton>
         </EuiForm>

@@ -1,6 +1,7 @@
-export const humanNumber = (n: number): string|number => {
-   return toHumanString(n);
-}
+export const humanNumber = (n: number | undefined): string | number => {
+    if (typeof n === 'undefined') return '';
+    return toHumanString(n);
+};
 
 const PREFIXES = {
     '24': 'Y',
@@ -19,7 +20,7 @@ const PREFIXES = {
     '-15': 'f',
     '-18': 'a',
     '-21': 'z',
-    '-24': 'y'
+    '-24': 'y',
 };
 
 function getExponent(n) {
@@ -34,7 +35,7 @@ function precise(n) {
 }
 
 function toHumanString(sn) {
-    var n = precise(Number.parseFloat(sn));
-    var e = Math.max(Math.min(3 * Math.floor(getExponent(n) / 3), 24), -24);
+    const n = precise(Number.parseFloat(sn));
+    const e = Math.max(Math.min(3 * Math.floor(getExponent(n) / 3), 24), -24);
     return precise(n / Math.pow(10, e)).toString() + PREFIXES[e];
 }

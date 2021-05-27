@@ -7,7 +7,6 @@ import { ThemeProvider } from 'styled-components';
 import * as euiVars from '@elastic/eui/dist/eui_theme_light.json';
 import '@elastic/eui/dist/eui_theme_dark.css';
 
-import './server'
 
 ReactDOM.render(
   <React.StrictMode>

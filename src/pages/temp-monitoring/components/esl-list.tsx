@@ -1,35 +1,6 @@
 import React, {FC, useEffect, useState} from 'react';
 import {EuiSelectable, EuiBadge} from "@elastic/eui";
-import client from "redaxios";
-import { get } from "get-wild";
-
-const loadEslList = async () => {
-    try {
-        const {data} = await client.post('http://localhost:9200/li-*/_search', {
-            "size": 0,
-            "aggs": {
-                "langs": {
-                    "composite": {
-                        "size": 3000,
-                        "sources": [
-                            {
-                                "esl": {
-                                    "terms": {
-                                        "field": "esl"
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        });
-
-        return get(data, "aggregations.langs.buckets");
-    } catch (e) {
-        return [];
-    }
-};
+import {loadEslList} from "../../../query/load-esl-list";
 
 interface Props {
     onChangeEsl: (esl: number) => void
@@ -42,15 +13,16 @@ export const EslList: FC<Props> = ({onChangeEsl = () => {}, isGlobalLoading = fa
 
     useEffect(() => {
         const load = async () => {
-            const buckets = await loadEslList();
+            const esls = await loadEslList();
 
 
-            const options = buckets.map((b) => ({
-                label: `${b.key.esl}`,
-                esl: b.key.esl,
-                append: <EuiBadge>{b.doc_count}</EuiBadge>,
+            const options = esls.map((b) => ({
+                label: `${b.esl}`,
+                esl: b.esl,
+                append: <EuiBadge>{b.docCount}</EuiBadge>,
             }));
 
+            // @ts-ignore
             setOptions(options);
             setIsloading(false);
         };

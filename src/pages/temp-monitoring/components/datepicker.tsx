@@ -26,8 +26,6 @@ export const Datepicker: FC<Props> = ({isLoading = false, onChange = () => {}}) 
             throw new Error('Unable to parse end string');
         }
 
-        console.log(startMoment.utc(), endMoment.utc())
-
         if (onChange) {
             onChange(startMoment.utc(), endMoment.utc())
         }

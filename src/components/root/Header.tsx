@@ -11,7 +11,6 @@ import {
     EuiIcon,
     EuiKeyPadMenu,
     EuiKeyPadMenuItem,
-    EuiLink,
     EuiPopover,
     EuiSpacer,
     EuiText,
@@ -104,7 +103,7 @@ const HeaderUserMenu = () => {
 
                     <EuiFlexItem>
                         <EuiText>
-                            <p>test</p>
+                            <p>tester</p>
                         </EuiText>
 
                         <EuiSpacer size="m" />
@@ -184,6 +183,31 @@ const HeaderAppMenu = () => {
                 >
                     <EuiIcon type="discoverApp" size="l" />
                 </EuiKeyPadMenuItem>
+                <EuiKeyPadMenuItem
+                    label="Аналитика полей"
+                    data-url="/field-stats"
+                    // @ts-ignore
+                    onClick={onClick}
+                >
+                    <EuiIcon type="visBarHorizontalStacked" size="l" />
+                </EuiKeyPadMenuItem>
+                <EuiKeyPadMenuItem
+                    label="Мониторинг температуры ценников"
+                    data-url="/temp-stat"
+                    // @ts-ignore
+                    onClick={onClick}
+                >
+                    <EuiIcon type="monitoringApp" size="l" />
+                </EuiKeyPadMenuItem>
+
+                <EuiKeyPadMenuItem
+                    label="Статистика темпа добавления логов"
+                    data-url="/stat"
+                    // @ts-ignore
+                    onClick={onClick}
+                >
+                    <EuiIcon type="visualizeApp" size="l" />
+                </EuiKeyPadMenuItem>
 
                 <EuiKeyPadMenuItem
                     label="Пользователи"
@@ -201,32 +225,6 @@ const HeaderAppMenu = () => {
                     onClick={onClick}
                 >
                     <EuiIcon type="user" size="l" />
-                </EuiKeyPadMenuItem>
-
-                <EuiKeyPadMenuItem
-                    label="Аналитика полей"
-                    data-url="/field-stats"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="visBarHorizontalStacked" size="l" />
-                </EuiKeyPadMenuItem>
-
-                <EuiKeyPadMenuItem
-                    label="Мониторинг температуры ценников"
-                    data-url="/temp-stat"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="monitoringApp" size="l" />
-                </EuiKeyPadMenuItem>
-                <EuiKeyPadMenuItem
-                    label="Статистика темпа добавления логов"
-                    data-url="/stat"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="visualizeApp" size="l" />
                 </EuiKeyPadMenuItem>
             </EuiKeyPadMenu>
         </EuiPopover>

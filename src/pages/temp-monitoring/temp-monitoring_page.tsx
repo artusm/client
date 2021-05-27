@@ -12,77 +12,74 @@ import {Datepicker} from "./components/datepicker";
 import React, {useEffect, useState} from "react";
 import client from "redaxios";
 import {get} from "get-wild";
-import moment from "moment";
 import Chart from "react-apexcharts";
+
 import Header from "../../components/root/Header";
+import {DEFAULT_CONFIG, TimeBuckets} from "../../utils/time_buckets";
+import {convertDatesToLocal} from "../../utils/date";
 
-const convertDatesToLocal = (dates) => {
-    if (dates && Array.isArray(dates)) {
-        return dates.map(d => moment(d).utcOffset(360).format('YYYY-MM-DD HH:mm:ss'))
-    }
-
-    return [];
-}
-
-function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-}
-
-
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 const loadData = async (esl, startTime, endTime) => {
     try {
-        const {data} = await client.post('http://localhost:9200/li-*/_search', {
-            "size": 0,
-            "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "match": {
-                                "esl": esl
-                            }
-                        }
-                    ],
-                    "filter": [
-                        {
-                            "range": {
-                                "@timestamp": {
-                                    "gte": startTime.format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
-                                    "lte": endTime.format("YYYY-MM-DDTHH:mm:ss.SSSZ")
-                                }
-                            }
-                        }
-                    ]
-                }
-            },
-            "aggs": {
-                "histogram_with_avg_temp": {
-                    "auto_date_histogram": {
-                        "field": "@timestamp",
-                        "buckets": 20,
-                    },
-                    "aggs": {
-                        "avg_temp": {
-                            "avg": {
-                                "field": "esl_database_status.temp"
-                            }
-                        }
-                    }
-                }
-            }
+        const timeBuckets = new TimeBuckets(DEFAULT_CONFIG);
+
+        timeBuckets.setBounds({
+            min: startTime,
+            max: endTime,
         });
 
-        const dates = convertDatesToLocal(get(data, 'aggregations.histogram_with_avg_temp.buckets.*.key_as_string') ?? []);
-        const xxl1 = get(data, 'aggregations.histogram_with_avg_temp.buckets.*.avg_temp.value') ?? [];
+        const { data } = await client.post("http://localhost:9200/li-*/_search", {
+            size: 0,
+            query: {
+                bool: {
+                    must: [
+                        {
+                            match: {
+                                esl: esl,
+                            },
+                        },
+                    ],
+                    filter: [
+                        {
+                            range: {
+                                "@timestamp": {
+                                    gte: startTime.format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                                    lte: endTime.format("YYYY-MM-DDTHH:mm:ss.SSSZ"),
+                                },
+                            },
+                        },
+                    ],
+                },
+            },
+            aggs: {
+                timestamp_histogram: {
+                    histogram: {
+                        field: "@timestamp",
+                        interval: timeBuckets.getInterval().asMilliseconds(),
+                    },
+                    aggs: {
+                        avg_temp: {
+                            avg: {
+                                field: "esl_database_status.temp",
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        const dates = convertDatesToLocal(
+            get(data, "aggregations.timestamp_histogram.buckets.*.key_as_string") ??
+            []
+        );
+        const xxl1 =
+            get(data, "aggregations.timestamp_histogram.buckets.*.avg_temp.value") ??
+            [];
 
         return {
             dates,
-            xxl1
+            xxl1,
+            dateFormat: timeBuckets.getScaledDateFormat()
         };
     } catch (e) {
         return [];
@@ -131,18 +128,8 @@ const useData = () => {
 
 
 function TempMonitoringPage() {
-    // @ts-ignore
-    window.server.shutdown();
     const {data, onChangeEsl, isLoading, onTimeChange} = useData();
-    useEffect(() => {
-        // @ts-ignore
-        window.server.shutdown();
 
-        return () => {
-            //@ts-ignore
-            console.log(window.server.start)
-        }
-    }, [])
     return (
         <>
             <Header
@@ -202,14 +189,15 @@ function getOptions(data) {
             type: 'datetime',
             categories: data.dates,
             labels: {
-                datetimeUTC: false
+                datetimeUTC: false,
+                format: data.dateFormat
             }
         },
         tooltip: {
             theme: 'dark',
             x: {
-                format: 'dd.MM.yy HH:mm'
-            },
+                format: data.dateFormat
+            }
         },
     }
 }
