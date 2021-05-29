@@ -87,53 +87,85 @@ const FieldDataVisualizerPage = () => {
 };
 
 
-
+const buildField = (fieldName: string, type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES]): HistogramField => ({
+    fieldName,
+    type,
+});
 
 const fields: HistogramField[] = [
-    {
-        fieldName: '@timestamp',
-        type: FIELD_TYPES.DATE,
-    },
-    {
-        fieldName: 'message',
-        type: FIELD_TYPES.TEXT,
-    },
-    {
-        fieldName: 'offset',
-        type: FIELD_TYPES.NUMBER,
-    },
-    {
-        fieldName: 'level',
-        type: FIELD_TYPES.KEYWORD,
-    },
-    {
-        fieldName: 'esl_database_status.idx',
-        type: FIELD_TYPES.KEYWORD
-    },
-    {
-        fieldName: 'read_at',
-        type: FIELD_TYPES.DATE,
-    },
-    {
-        fieldName: 'esl',
-        type: FIELD_TYPES.NUMBER,
-    },
-    {
-        fieldName: 'machine.hostname',
-        type: FIELD_TYPES.KEYWORD,
-    },
-    {
-        fieldName: 'log_type',
-        type: FIELD_TYPES.KEYWORD,
-    },
-    {
-        fieldName: 'source',
-        type: FIELD_TYPES.KEYWORD,
-    },
-    {
-        fieldName: 'type',
-        type: FIELD_TYPES.KEYWORD,
-    }
+    buildField('@timestamp', FIELD_TYPES.DATE),
+    buildField('message', FIELD_TYPES.TEXT),
+    buildField('offset', FIELD_TYPES.NUMBER),
+    buildField('level', FIELD_TYPES.KEYWORD),
+    buildField('read_at', FIELD_TYPES.DATE),
+    buildField('esl', FIELD_TYPES.NUMBER),
+    buildField('machine.hostname', FIELD_TYPES.KEYWORD),
+    buildField('log_type', FIELD_TYPES.KEYWORD),
+    buildField('source', FIELD_TYPES.KEYWORD),
+    buildField('type', FIELD_TYPES.KEYWORD),
+    // buildField('esl_status.PROTONV', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.BOOTMODE', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.BOOTVER', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.APPVER', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.HWTYPE', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.DispType', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.ImageType', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Crc32Img', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Crc32Fw', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.DispCol', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.ScDimX', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.ScDimY', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Uptime', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.TotalTime', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.DrawSum', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Vmin', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Vlast', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Temp', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Rssi', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.Errcode', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.ErrTime', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.ErrFileID', FIELD_TYPES.NUMBER),
+    // buildField('esl_status.ErrLine', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.id', FIELD_TYPES.KEYWORD),
+    buildField('esl_database_status.idx', FIELD_TYPES.KEYWORD),
+    buildField('esl_database_status.driver', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.online', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.type', FIELD_TYPES.KEYWORD),
+    buildField('esl_database_status.size', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.display_type', FIELD_TYPES.KEYWORD),
+    buildField('esl_database_status.height', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.width', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.proton_version', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.hw_version', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.sw_version', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.boot_version', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.boot_mode', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.esl_disp_type', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.esl_image_type', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.esl_disp_col', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.esl_width', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.esl_height', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.draw_count', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.batt_last', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.batt_min', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.temp', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.rssi', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.uptime', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.total_time', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.timestamp', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.err_timestamp', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.errcode', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.err_file', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.err_line', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.pic_crc', FIELD_TYPES.NUMBER),
+    buildField('esl_database_status.fw_crc', FIELD_TYPES.NUMBER),
+    buildField('event.type', FIELD_TYPES.KEYWORD),
+    buildField('event.timestamp', FIELD_TYPES.NUMBER),
+    buildField('event.els', FIELD_TYPES.NUMBER),
+    buildField('event.id', FIELD_TYPES.NUMBER),
+    buildField('event.error', FIELD_TYPES.NUMBER),
+    buildField('event.dongle', FIELD_TYPES.NUMBER),
+    buildField('event.slot', FIELD_TYPES.NUMBER),
 ];
 
 
@@ -143,7 +175,7 @@ const initialState = {
 }
 
 const useData = () => {
-    const [samplerShardSize, setSamplerShardSize] = useState(-1);
+    const [samplerShardSize, setSamplerShardSize] = useState(5000);
     const [error, setError] = useState<any>(null);
     const [query, setQuery] = useState<QueryContainer>({});
     const [startTime, setStartTime] = useState(null);

@@ -5,7 +5,7 @@ import {
     EuiPageContent,
     EuiPageContentBody,
     EuiPageSideBar,
-    EuiSelectable
+    EuiSelectable, EuiCallOut
 } from "@elastic/eui";
 import {EslList} from "./components/esl-list";
 import {Datepicker} from "./components/datepicker";
@@ -92,6 +92,7 @@ const useData = () => {
     const [startTime, setStartTime] = useState(null);
     const [endTime, setEndTime] = useState(null);
     const [data, setData] = useState(null);
+    const [error, setError] = useState<any>(null);
 
     const onChangeEsl = (esl) => {
         setEsl(esl);
@@ -109,7 +110,9 @@ const useData = () => {
                     const data = await loadData(esl, startTime, endTime);
                     // @ts-ignore
                     setData(data);
-                } catch (e) {}
+                } catch (e) {
+                    setError(e)
+                }
 
                 setIsLoading(false);
             };
@@ -123,12 +126,13 @@ const useData = () => {
         isLoading,
         onChangeEsl,
         onTimeChange,
+        error,
     }
 }
 
 
 function TempMonitoringPage() {
-    const {data, onChangeEsl, isLoading, onTimeChange} = useData();
+    const {data, onChangeEsl, isLoading, onTimeChange, error} = useData();
 
     return (
         <>
@@ -158,6 +162,13 @@ function TempMonitoringPage() {
                         color="transparent"
                         borderRadius="none">
                         <EuiPageContentBody>
+                            {error && (
+                                <EuiCallOut
+                                    iconType="faceSad"
+                                    color="danger"
+                                    title={`Ошибка при поиске: ${error?.message}`}
+                                />
+                            )}
                             {data && <Chart
                                 // @ts-ignore
                                 options={getOptions(data)}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Header from "../../components/root/Header";
 import {
     EuiAvatar,
@@ -9,12 +9,15 @@ import {
     EuiPageContentBody,
     EuiPageHeader,
     EuiBasicTable,
+    EuiInMemoryTable,
     EuiButton,
-    EuiHealth,
+    EuiHealth, EuiEmptyPrompt,
 } from "@elastic/eui";
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 import Link from "../../components/Link";
 import { useHistory } from "react-router";
+import {makeServer} from "../../server";
+import {useServer} from "../../utils/server";
 
 const AddNewUserButton = () => {
     const history = useHistory();
@@ -27,6 +30,7 @@ const AddNewUserButton = () => {
 };
 
 const UserListPage = () => {
+    useServer();
     return (
         <>
             <Header
@@ -91,9 +95,6 @@ const columns = [
         <EuiAvatar size="s" name={username} /> {username}
       </span>
         ),
-        footer: ({ items, pagination }) => {
-            return <strong>Всего: {items.length}</strong>;
-        },
     },
     {
         field: "full_name",
@@ -102,6 +103,7 @@ const columns = [
         mobileOptions: {
             show: false,
         },
+        sortable: true,
     },
     {
         field: "email",
@@ -123,6 +125,7 @@ const columns = [
                 </strong>
             );
         },
+        sortable: true,
     },
     {
         name: "Дейсвия",
@@ -133,19 +136,99 @@ const columns = [
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+
+const pagination = {
+    initialPageSize: 5,
+    pageSizeOptions: [5, 10, 15],
+};
+
 const UserList = () => {
-    const { data } = useSWR("/api/users", fetcher);
+    const { data, mutate } = useSWR("/api/users", fetcher, {
+        onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+            setTimeout(() => revalidate({ retryCount }), 50)
+        }
+    });
+    const [selection, setSelection] = useState([]);
+    const [message, setMessage] = useState(
+        () => <EuiEmptyPrompt
+            title={<h3>Загрузка пользователей</h3>}
+            titleSize="xs"
+            body="Идет загрузка пользователей"
+        />
+    );
 
     const items = data ? data : [];
+    const isLoading = !data;
+
+    const selectionValue = {
+        selectable: (user) => user.username !== 'tester',
+        selectableMessage: (selectable) =>
+            !selectable ? 'Вы не можете выделить этого пользователя' : undefined,
+        onSelectionChange: (selection) => setSelection(selection),
+        initialSelected: [],
+    };
+
+    const deleteUsers = async () => {
+        if (window.confirm('Удалить')) {
+            const url = `/api/users/${selection.map(({id}) => id).join()}`
+            console.log(url)
+            await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            });
+            mutate();
+        }
+    }
+
+    const renderDeleteButton = () => {
+        if (selection.length === 0) {
+            return;
+        }
+
+        return (
+            <EuiButton color="danger" iconType="trash" onClick={deleteUsers}>
+                Удалить ({selection.length})
+            </EuiButton>
+        );
+    };
+    const search = {
+        toolsLeft: renderDeleteButton(),
+        box: {
+            incremental: true,
+        },
+        filters: [
+            {
+                type: 'is',
+                field: 'enabled',
+                name: 'Активные пользователи',
+                negatedName: false,
+            },
+        ],
+    };
 
     // @ts-ignore
     return (
-        <EuiBasicTable
-            items={items}
-            rowHeader="username"
-            // @ts-ignore
-            columns={columns}
-        />
+        <>
+            <EuiInMemoryTable
+                items={items}
+                itemId="id"
+                message={message}
+                loading={isLoading}
+                rowHeader="username"
+                // @ts-ignore
+                columns={columns}
+                // @ts-ignore
+                search={search}
+                sorting={true}
+                isSelectable={true}
+                // @ts-ignore
+                selection={selectionValue}
+                pagination={pagination}
+            />
+        </>
     );
 };
 

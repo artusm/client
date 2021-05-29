@@ -12,7 +12,7 @@ import {DocumentsCount} from "./documents-count";
 import {DistinctValues} from "./distinct-values";
 import {NumberStat} from "./number-stat";
 import {ExampleList} from "./ExampleList";
-import {IndexBasedNumberContentPreview, TopValue, TopValues} from "../TopValues";
+import {TopValue, TopValues} from "../TopValues";
 
 interface FieldStatData {
     count?: number;

@@ -1,6 +1,15 @@
 import { Server } from "miragejs";
 
 export function makeServer({ environment = "development" } = {}) {
+    const createUser = (username) => ({
+        enabled: false,
+        username,
+        email: `${username}@example.com`,
+        full_name: username,
+        password: username,
+        permissions: ['access_field_analyse']
+    })
+
     let server = new Server({
         environment,
 
@@ -14,19 +23,29 @@ export function makeServer({ environment = "development" } = {}) {
                         full_name: 'вфывф ывф ы',
                         password: 'test',
                         permissions: ['edit_users', 'access_anomaly_logs', 'access_field_analyse', 'user_list']
-                    }
+                    },
+                    createUser('user1'),
+                    createUser('user2'),
+                    createUser('user3'),
+                    createUser('user4'),
+                    createUser('user5'),
+                    createUser('user6'),
+                    createUser('user7'),
+                    createUser('user8'),
+                    createUser('user9'),
+                    createUser('user10'),
+                    createUser('user11'),
+                    createUser('user12'),
+                    createUser('user13'),
+                    createUser('user14'),
                 ]
             })
         },
 
         routes() {
             this.namespace = "api";
-            this.timing = 750;
+            this.timing = 300;
             this.urlPrefix = 'http://localhost:3000'
-
-            this.get("/stats", () => {
-                return {totalCount: 4020916, errorCount: 402, rayCount: 1762763, driverCount: 1947878, accessCount: 310275, newForHour: 1231, newForDay: 574123, anomalyCount: 3}
-            });
 
             this.get("/users", ({db}) => {
                 return db.users
@@ -37,6 +56,18 @@ export function makeServer({ environment = "development" } = {}) {
 
                 return db.users.findBy({
                     username,
+                })
+            });
+
+            this.delete("/users/:ids", ({db}, request) => {
+                const {ids} = request.params;
+
+                const idsNumber = ids.split(',');
+
+                idsNumber.forEach(id => db.users.remove(id));
+
+                return db.users.findBy({
+                    status: true
                 })
             });
 
@@ -67,35 +98,6 @@ export function makeServer({ environment = "development" } = {}) {
 
                 return {success: false}
             });
-
-            this.get("/anomaly-logs", ({db}) => {
-                return [
-                    {
-                        description: "Пустой статус",
-                        timestamp: "2021-05-23T06:50:00.000Z",
-                        criticLevel: 3,
-                        log: {
-                            message: "ESL 2000003463534 Status {}"
-                        }
-                    },
-                    {
-                        description: "Пустой статус",
-                        timestamp: "2021-05-23T06:50:00.000Z",
-                        criticLevel: 3,
-                        log: {
-                            message: "ESL 2000003463534 Status {}"
-                        }
-                    },
-                    {
-                        description: "Пустой статус",
-                        timestamp: "2021-05-23T06:50:00.000Z",
-                        criticLevel: 3,
-                        log: {
-                            message: "ESL 2000003463534 Status {}"
-                        }
-                    },
-                ]
-            })
 
             this.put("/users/:id", ({db}, request) => {
                 let user = JSON.parse(request.requestBody);

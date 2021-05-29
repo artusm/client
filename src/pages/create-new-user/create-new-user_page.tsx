@@ -19,8 +19,10 @@ import {
 } from '@elastic/eui';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
+import {useServer} from "../../utils/server";
 
 const NewUserPage = () => {
+    useServer();
     return (
         <>
             <Header

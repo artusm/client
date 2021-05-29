@@ -18,8 +18,10 @@ import {
 } from "@elastic/eui";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
+import {useServer} from "../../utils/server";
 
 const OverviewPage = () => {
+    useServer();
     // @ts-ignore
     const { username } = useParams();
     const {data} = useSWR(`/api/users/${username}`);

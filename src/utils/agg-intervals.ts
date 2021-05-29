@@ -1,5 +1,5 @@
 import client from 'redaxios';
-import { get, find, last } from 'lodash';
+import { get, find, last, chunk } from 'lodash';
 
 import {
     FIELD_TYPES
@@ -14,80 +14,12 @@ import {
 import {Moment} from "moment";
 import {isEmpty} from "./object";
 
-export const MAX_CHART_COLUMNS = 20;
 const SAMPLER_TOP_TERMS_SHARD_SIZE = 5000;
 
 export interface HistogramField {
     fieldName: string;
     type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 }
-
-interface NumericColumnStats {
-    interval: number;
-    min: number;
-    max: number;
-    avg: number;
-    count: number;
-}
-
-type NumericColumnStatsMap = Record<string, NumericColumnStats>;
-
-export const getAggIntervals = async (
-    fields: HistogramField[],
-    query: any,
-    samplerShardSize: number
-) => {
-    const numericColumns = fields.filter((field) => {
-        return field.type === FIELD_TYPES.NUMBER || field.type === FIELD_TYPES.DATE;
-    });
-
-    if (numericColumns.length === 0) {
-        return {};
-    }
-
-    const minMaxAggs = numericColumns.reduce((aggs, c) => {
-        const id = stringHash(c.fieldName);
-        aggs[id] = {
-            stats: {
-                field: c.fieldName,
-            },
-        };
-        return aggs;
-    }, {} as Record<string, object>);
-
-    const { data } = await client.post('http://localhost:9200/li-*/_search', {
-        query,
-        aggs: buildSamplerAggregation(minMaxAggs, samplerShardSize),
-        size: 0,
-    });
-
-    const aggsPath = getSamplerAggregationsResponsePath(samplerShardSize);
-    const aggregations =
-        aggsPath.length > 0 ? get(data.aggregations, aggsPath) : data.aggregations;
-
-    return Object.keys(aggregations).reduce((p, aggName) => {
-        const stats = [aggregations[aggName].min, aggregations[aggName].max];
-        if (!stats.includes(null)) {
-            const delta = aggregations[aggName].max - aggregations[aggName].min;
-
-            let aggInterval = 1;
-
-            if (delta > MAX_CHART_COLUMNS || delta <= 1) {
-                aggInterval = delta / (MAX_CHART_COLUMNS - 1);
-            }
-
-            p[aggName] = {
-                interval: aggInterval,
-                min: stats[0],
-                max: stats[1],
-                avg: aggregations[aggName].avg,
-                count: aggregations[aggName].count,
-            };
-        }
-
-        return p;
-    }, {} as NumericColumnStatsMap);
-};
 
 export function getSafeAggregationName(fieldName: string, index: number): string {
     return fieldName.match(/^[a-zA-Z0-9-_.]+$/) ? fieldName : `field_${index}`;
@@ -357,7 +289,11 @@ export const getFieldStats = async (
         fields: []
     };
 
-    promisses.push(getNonTextFieldStats(nonTextFields, query, earliest, latest, samplerShardSize), getTotalCount(query, earliest, latest));
+    promisses.push(getTotalCount(query, earliest, latest));
+
+    chunk(nonTextFields, 17).forEach((fields) => {
+        promisses.push(getNonTextFieldStats(fields, query, earliest, latest, samplerShardSize));
+    })
 
     textFields.forEach(field => {
         promisses.push(getFieldExamples(field, query, earliest, latest, samplerShardSize))

@@ -112,11 +112,11 @@ const HeaderUserMenu = () => {
                             <EuiFlexItem>
                                 <EuiFlexGroup justifyContent="spaceBetween">
                                     <EuiFlexItem grow={false}>
-                                        <Link to={`/users/test`}>Редактировать</Link>
+                                        <Link to='/users/test'>Редактировать</Link>
                                     </EuiFlexItem>
 
                                     <EuiFlexItem grow={false}>
-                                        <Link to={`/login`}>Выйти</Link>
+                                        <Link to='/login'>Выйти</Link>
                                     </EuiFlexItem>
                                 </EuiFlexGroup>
                             </EuiFlexItem>
@@ -207,6 +207,14 @@ const HeaderAppMenu = () => {
                     onClick={onClick}
                 >
                     <EuiIcon type="visualizeApp" size="l" />
+                </EuiKeyPadMenuItem>
+                <EuiKeyPadMenuItem
+                    label="Логи с аномалиями"
+                    data-url="/anomaly-logs"
+                    // @ts-ignore
+                    onClick={onClick}
+                >
+                    <EuiIcon type="sqlApp" size="l" />
                 </EuiKeyPadMenuItem>
 
                 <EuiKeyPadMenuItem

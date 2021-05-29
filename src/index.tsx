@@ -6,6 +6,10 @@ import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from 'styled-components';
 import * as euiVars from '@elastic/eui/dist/eui_theme_light.json';
 import '@elastic/eui/dist/eui_theme_dark.css';
+import moment from "moment";
+
+import 'moment/locale/ru';
+moment.locale('ru');
 
 
 ReactDOM.render(

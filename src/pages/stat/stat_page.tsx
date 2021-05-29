@@ -22,61 +22,46 @@ import { Datepicker } from '../../components/datepicker';
 import { convertDatesToLocal } from '../../utils/date';
 import { DEFAULT_CONFIG, TimeBuckets } from '../../utils/time_buckets';
 import {isEmpty} from "../../utils/object";
+import {buildBaseFilterCriteria} from "../../utils/agg-intervals";
 
 const loadData = async (query: QueryContainer, startTime, endTime) => {
-    try {
-        const timeBuckets = new TimeBuckets(DEFAULT_CONFIG);
+    const timeBuckets = new TimeBuckets(DEFAULT_CONFIG);
 
-        timeBuckets.setBounds({
-            min: startTime,
-            max: endTime,
-        });
+    timeBuckets.setBounds({
+        min: startTime,
+        max: endTime,
+    });
 
-        let newQuery = {
+    let filterCriteria = buildBaseFilterCriteria(startTime, endTime, query);
+
+
+    const { data } = await client.post('http://localhost:9200/li-*/_search', {
+        size: 0,
+        query: {
             bool: {
-                filter: [
-                    {
-                        range: {
-                            '@timestamp': {
-                                gte: startTime.format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
-                                lte: endTime.format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
-                            },
-                        },
-                    },
-                ],
+                filter: filterCriteria,
             },
-        };
-
-        if (!isEmpty(query?.match_all)) {
-            newQuery = merge(newQuery, query);
-        }
-
-        const { data } = await client.post('http://localhost:9200/li-*/_search', {
-            size: 0,
-            query: newQuery,
-            aggs: {
+        },
+        aggs: {
+            histogram: {
                 histogram: {
-                    histogram: {
-                        field: '@timestamp',
-                        interval: timeBuckets.getInterval().asMilliseconds(),
-                    },
+                    field: '@timestamp',
+                    interval: timeBuckets.getInterval().asMilliseconds(),
                 },
             },
-        });
+        },
+    });
 
-        const dates = convertDatesToLocal(
-            get(data, 'aggregations.histogram.buckets.*.key_as_string') ?? []
-        );
-        const xxl1 = get(data, 'aggregations.histogram.buckets.*.doc_count') ?? [];
+    const dates = convertDatesToLocal(
+        get(data, 'aggregations.histogram.buckets.*.key_as_string') ?? []
+    );
+    const xxl1 = get(data, 'aggregations.histogram.buckets.*.doc_count') ?? [];
 
-        return {
-            dates,
-            xxl1,
-            dateFormat: timeBuckets.getScaledDateFormat(),
-        };
-    } catch (e) {
-        return [];
-    }
+    return {
+        dates,
+        xxl1,
+        dateFormat: timeBuckets.getScaledDateFormat(),
+    };
 };
 
 const useData = () => {
@@ -105,7 +90,9 @@ const useData = () => {
                 try {
                     const data = await loadData(query, startTime, endTime);
                     setData(data);
-                } catch (e) {}
+                } catch (e) {
+                    setError(e)
+                }
 
                 setIsLoading(false);
             };
@@ -191,9 +178,23 @@ function getOptions(data) {
         chart: {
             height: 350,
             type: 'area',
+            animations: {
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800,
+                animateGradually: {
+                    enabled: true,
+                    delay: 150
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 350
+                }
+            }
         },
         dataLabels: {
             enabled: false,
+
         },
         stroke: {
             curve: 'smooth',
@@ -203,8 +204,8 @@ function getOptions(data) {
             categories: data.dates,
             labels: {
                 datetimeUTC: false,
-                format: data.dateFormat,
-            },
+                format: data.dateFormat
+            }
         },
         tooltip: {
             theme: 'dark',

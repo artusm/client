@@ -1,0 +1,300 @@
+{
+	"index_patterns": [
+		"li-*"
+	],
+	"order": 341241,
+	"version": 125,
+	"template": {},
+	"settings": {
+		"index": {
+			"lifecycle": {
+				"name": "li",
+				"rollover_alias": "li"
+			},
+			"mapping": {
+				"total_fields": {
+					"limit": "1000"
+				}
+			},
+			"search": {
+				"slowlog": {
+					"threshold": {
+						"fetch": {
+							"warn": "1s",
+							"trace": "1s",
+							"debug": "1s",
+							"info": "1s"
+						},
+						"query": {
+							"warn": "1s",
+							"trace": "1s",
+							"debug": "1s",
+							"info": "1s"
+						}
+					}
+				}
+			},
+			"refresh_interval": "5s",
+			"max_docvalue_fields_search": "100"
+		}
+	},
+	"mappings": {
+		"date_detection": false,
+		"properties": {
+			"@timestamp": {
+				"type": "date"
+			},
+			"timestamp": {
+				"type": "alias",
+				"path": "@timestamp"
+			},
+			"read_at": {
+				"type": "date"
+			},
+			"message": {
+				"type": "text",
+				"norms": false
+			},
+			"offset": {
+				"type": "long"
+			},
+			"esl": {
+				"type": "long"
+			},
+			"level": {
+				"type": "keyword",
+				"ignore_above": 32
+			},
+			"machine": {
+				"properties": {
+					"hostname": {
+						"type": "keyword",
+						"ignore_above": 64
+					}
+				}
+			},
+			"log_type": {
+				"type": "keyword",
+				"ignore_above": 32
+			},
+			"source": {
+				"type": "keyword",
+				"ignore_above": 256
+			},
+			"type": {
+				"type": "keyword",
+				"ignore_above": 32
+			},
+			"anomaly_category": {
+				"type": "keyword",
+				"ignore_above": 32
+			},
+			"esl_status": {
+				"properties": {
+					"PROTONV": {
+						"type": "short"
+					},
+					"BOOTMODE": {
+						"type": "short"
+					},
+					"BOOTVER": {
+						"type": "short"
+					},
+					"APPVER": {
+						"type": "short"
+					},
+					"HWTYPE": {
+						"type": "short"
+					},
+					"DispType": {
+						"type": "short"
+					},
+					"ImageType": {
+						"type": "short"
+					},
+					"Crc32Img": {
+						"type": "long"
+					},
+					"Crc32Fw": {
+						"type": "long"
+					},
+					"DispCol": {
+						"type": "short"
+					},
+					"ScDimX": {
+						"type": "short"
+					},
+					"ScDimY": {
+						"type": "short"
+					},
+					"Uptime": {
+						"type": "long"
+					},
+					"TotalTime": {
+						"type": "long"
+					},
+					"DrawSum": {
+						"type": "short"
+					},
+					"Vmin": {
+						"type": "short"
+					},
+					"Vlast": {
+						"type": "short"
+					},
+					"Temp": {
+						"type": "short"
+					},
+					"Rssi": {
+						"type": "short"
+					},
+					"Errcode": {
+						"type": "short"
+					},
+					"ErrTime": {
+						"type": "long"
+					},
+					"ErrFileID": {
+						"type": "integer"
+					},
+					"ErrLine": {
+						"type": "long"
+					}
+				}
+			},
+			"esl_database_status": {
+				"properties": {
+					"id": {
+						"type": "keyword",
+						"ignore_above": 14
+					},
+					"idx": {
+						"type": "keyword",
+						"ignore_above": 32
+					},
+					"driver": {
+						"type": "short"
+					},
+					"online": {
+						"type": "short"
+					},
+					"type": {
+						"type": "keyword",
+						"ignore_above": 32
+					},
+					"size": {
+						"type": "half_float"
+					},
+					"display_type": {
+						"type": "keyword",
+						"ignore_above": 32
+					},
+					"height": {
+						"type": "short"
+					},
+					"width": {
+						"type": "short"
+					},
+					"proton_version": {
+						"type": "short"
+					},
+					"hw_version": {
+						"type": "short"
+					},
+					"sw_version": {
+						"type": "short"
+					},
+					"boot_version": {
+						"type": "short"
+					},
+					"boot_mode": {
+						"type": "short"
+					},
+					"esl_disp_type": {
+						"type": "short"
+					},
+					"esl_image_type": {
+						"type": "short"
+					},
+					"esl_disp_col": {
+						"type": "short"
+					},
+					"esl_width": {
+						"type": "short"
+					},
+					"esl_height": {
+						"type": "short"
+					},
+					"draw_count": {
+						"type": "short"
+					},
+					"batt_last": {
+						"type": "short"
+					},
+					"batt_min": {
+						"type": "short"
+					},
+					"temp": {
+						"type": "short"
+					},
+					"rssi": {
+						"type": "short"
+					},
+					"uptime": {
+						"type": "integer"
+					},
+					"total_time": {
+						"type": "integer"
+					},
+					"timestamp": {
+						"type": "integer"
+					},
+					"err_timestamp'": {
+						"type": "integer"
+					},
+					"errcode": {
+						"type": "short"
+					},
+					"err_file": {
+						"type": "integer"
+					},
+					"err_line": {
+						"type": "integer"
+					},
+					"pic_crc": {
+						"type": "long"
+					},
+					"fw_crc": {
+						"type": "long"
+					}
+				}
+			},
+			"event": {
+				"properties": {
+					"type": {
+						"type": "keyword",
+						"ignore_above": 32
+					},
+					"timestamp": {
+						"type": "integer"
+					},
+					"els": {
+						"type": "long"
+					},
+					"id": {
+						"type": "integer"
+					},
+					"error": {
+						"type": "byte"
+					},
+					"dongle": {
+						"type": "byte"
+					},
+					"slot": {
+						"type": "byte"
+					}
+				}
+			}
+		}
+	}
+}
