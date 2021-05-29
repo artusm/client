@@ -1,1 +1,1 @@
-export {default as TempMonitoringPage} from './temp-monitoring_page';
+export { default as TempMonitoringPage } from './temp-monitoring_page';

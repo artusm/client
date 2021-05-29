@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
     EuiAvatar,
     EuiFlexGroup,
@@ -14,30 +14,30 @@ import {
     EuiPopover,
     EuiSpacer,
     EuiText,
-    EuiBreadcrumb
-} from "@elastic/eui";
-import { v1 as uuidv1 } from "uuid";
-import { useHistory } from "react-router";
-import Link from "../Link";
+    EuiBreadcrumb,
+} from '@elastic/eui';
+import { v1 as uuidv1 } from 'uuid';
+import { useHistory } from 'react-router';
+import Link from '../Link';
 
-function htmlIdGenerator(idPrefix: string = "") {
+function htmlIdGenerator(idPrefix: string = '') {
     const staticUuid = uuidv1();
-    return (idSuffix: string = "") => {
-        const prefix = `${idPrefix}${idPrefix !== "" ? "_" : "i"}`;
-        const suffix = idSuffix ? `_${idSuffix}` : "";
+    return (idSuffix: string = '') => {
+        const prefix = `${idPrefix}${idPrefix !== '' ? '_' : 'i'}`;
+        const suffix = idSuffix ? `_${idSuffix}` : '';
         return `${prefix}${suffix ? staticUuid : uuidv1()}${suffix}`;
     };
 }
 
-const Header = ({breadcrumbs = []}: {breadcrumbs: EuiBreadcrumb[]}) => {
+const Header = ({ breadcrumbs = [] }: { breadcrumbs: EuiBreadcrumb[] }) => {
     return (
         <EuiHeader>
             <EuiHeaderSection grow={false}>
                 <EuiHeaderSectionItem border="right">
                     <Link to="/" className="euiHeaderLogo">
                         <img
-                            src={"https://retail.tools/img/14303839_324.png"}
-                            alt={"logo"}
+                            src={'https://retail.tools/img/14303839_324.png'}
+                            alt={'logo'}
                             style={{ height: 35 }}
                         />
                     </Link>
@@ -112,11 +112,11 @@ const HeaderUserMenu = () => {
                             <EuiFlexItem>
                                 <EuiFlexGroup justifyContent="spaceBetween">
                                     <EuiFlexItem grow={false}>
-                                        <Link to='/users/test'>Редактировать</Link>
+                                        <Link to="/users/test">Редактировать</Link>
                                     </EuiFlexItem>
 
                                     <EuiFlexItem grow={false}>
-                                        <Link to='/login'>Выйти</Link>
+                                        <Link to="/login">Выйти</Link>
                                     </EuiFlexItem>
                                 </EuiFlexGroup>
                             </EuiFlexItem>
@@ -131,8 +131,8 @@ const HeaderUserMenu = () => {
 const HeaderAppMenu = () => {
     const history = useHistory();
     const idGenerator = htmlIdGenerator();
-    const popoverId = idGenerator("popover");
-    const keypadId = idGenerator("keypad");
+    const popoverId = idGenerator('popover');
+    const keypadId = idGenerator('keypad');
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -159,7 +159,7 @@ const HeaderAppMenu = () => {
         const target = event.target;
 
         // @ts-ignore
-        const button = target.closest("[data-url]");
+        const button = target.closest('[data-url]');
 
         const url = button?.dataset?.url;
 

@@ -1,16 +1,16 @@
-import client from "redaxios";
-import {get} from "get-wild";
+import client from 'redaxios';
+import { get } from 'get-wild';
 
 const DEFAULT_SIZE = 3000;
 
 interface EslList {
     esl: number;
-    docCount: number
+    docCount: number;
 }
 
 export const loadEslList = async (): Promise<EslList[]> => {
     try {
-        const { data } = await client.post("http://localhost:9200/li-*/_search", {
+        const { data } = await client.post('http://localhost:9200/li-*/_search', {
             size: 0,
             aggs: {
                 esls: {
@@ -20,7 +20,7 @@ export const loadEslList = async (): Promise<EslList[]> => {
                             {
                                 esl: {
                                     terms: {
-                                        field: "esl",
+                                        field: 'esl',
                                     },
                                 },
                             },
@@ -30,12 +30,12 @@ export const loadEslList = async (): Promise<EslList[]> => {
             },
         });
 
-        const buckets = get(data, "aggregations.esls.buckets");
+        const buckets = get(data, 'aggregations.esls.buckets');
 
         return buckets.map((bucket) => ({
             esl: bucket.key.esl,
             docCount: bucket.doc_count,
-        }))
+        }));
     } catch (e) {
         return [];
     }

@@ -1,5 +1,5 @@
-import React, {FC, useEffect, useState} from "react";
-import Header from "../../components/root/Header";
+import React, { FC, useEffect, useState } from 'react';
+import Header from '../../components/root/Header';
 import {
     EuiPage,
     EuiPageBody,
@@ -13,25 +13,33 @@ import {
     EuiSpacer,
     EuiText,
     EuiLoadingContent,
-    EuiProgress
-} from "@elastic/eui";
-import {FieldStatItem} from "./componenets/field-stat-item/field-stat-item";
-import {FIELD_TYPES} from "../../common/field_types";
-import {getFieldStats, HistogramField} from "../../utils/agg-intervals";
-import {QueryContainer} from "@elastic/eui/src/components/search_bar/query/ast_to_es_query_dsl";
-import SearchBar from "../../components/search-bar";
-import {Datepicker} from "../../components/datepicker";
-import {ShardSizeFilter} from "./componenets/search_panel/shard_size_select";
+    EuiProgress,
+} from '@elastic/eui';
+import { FieldStatItem } from './componenets/field-stat-item/field-stat-item';
+import { FIELD_TYPES } from '../../common/field_types';
+import { getFieldStats, HistogramField } from '../../utils/agg-intervals';
+import { QueryContainer } from '@elastic/eui/src/components/search_bar/query/ast_to_es_query_dsl';
+import SearchBar from '../../components/search-bar';
+import { Datepicker } from '../../components/datepicker';
+import { ShardSizeFilter } from './componenets/search_panel/shard_size_select';
 
 const FieldDataVisualizerPage = () => {
-    const {isLoading, data, onSearch, error, onTimeChange, setSamplerShardSize, samplerShardSize, query} = useData();
+    const {
+        isLoading,
+        data,
+        onSearch,
+        error,
+        onTimeChange,
+        setSamplerShardSize,
+        samplerShardSize,
+    } = useData();
 
     return (
         <>
             <Header
                 breadcrumbs={[
                     {
-                        text: "Аналитика полей",
+                        text: 'Аналитика полей',
                     },
                 ]}
             />
@@ -41,7 +49,9 @@ const FieldDataVisualizerPage = () => {
                         iconType="visBarHorizontalStacked"
                         pageTitle="Аналитика полей"
                         description="Ф"
-                        rightSideItems={[<Datepicker isLoading={isLoading} onChange={onTimeChange} />]}
+                        rightSideItems={[
+                            <Datepicker isLoading={isLoading} onChange={onTimeChange} />,
+                        ]}
                     />
 
                     <EuiPageContent
@@ -52,18 +62,29 @@ const FieldDataVisualizerPage = () => {
                         borderRadius="none"
                     >
                         <EuiPageContentBody>
-                            <EuiFlexGroup gutterSize="m" alignItems="center" data-test-subj="mlDataVisualizerSearchPanel">
+                            <EuiFlexGroup gutterSize="m" alignItems="center">
                                 <EuiFlexItem>
                                     <SearchBar onSearch={onSearch} />
                                 </EuiFlexItem>
 
                                 <EuiFlexItem grow={false}>
-                                    <ShardSizeFilter samplerShardSize={samplerShardSize} setSamplerShardSize={setSamplerShardSize} />
+                                    <ShardSizeFilter
+                                        samplerShardSize={samplerShardSize}
+                                        setSamplerShardSize={setSamplerShardSize}
+                                    />
                                 </EuiFlexItem>
                                 <EuiFlexItem grow={false}>
-                                    <EuiText grow={false}>Всего: <b>{isLoading ? <EuiLoadingContent lines={1} /> : (data.totalCount)}</b></EuiText>
+                                    <EuiText grow={false}>
+                                        Всего:{' '}
+                                        <b>
+                                            {isLoading ? (
+                                                <EuiLoadingContent lines={1} />
+                                            ) : (
+                                                data.totalCount
+                                            )}
+                                        </b>
+                                    </EuiText>
                                 </EuiFlexItem>
-
                             </EuiFlexGroup>
                             {error && (
                                 <EuiCallOut
@@ -73,9 +94,13 @@ const FieldDataVisualizerPage = () => {
                                 />
                             )}
                             {isLoading && <EuiProgress size="xs" color="accent" />}
-                            {JSON.stringify(query)}
                             <EuiSpacer size={'l'} />
-                            <EuiFlexGroup alignItems="center" gutterSize="s" direction="row" wrap={true}>
+                            <EuiFlexGroup
+                                alignItems="center"
+                                gutterSize="s"
+                                direction="row"
+                                wrap={true}
+                            >
                                 <List isLoading={isLoading} data={data} />
                             </EuiFlexGroup>
                         </EuiPageContentBody>
@@ -86,8 +111,10 @@ const FieldDataVisualizerPage = () => {
     );
 };
 
-
-const buildField = (fieldName: string, type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES]): HistogramField => ({
+const buildField = (
+    fieldName: string,
+    type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES]
+): HistogramField => ({
     fieldName,
     type,
 });
@@ -168,11 +195,10 @@ const fields: HistogramField[] = [
     buildField('event.slot', FIELD_TYPES.NUMBER),
 ];
 
-
 const initialState = {
     totalCount: 0,
     fields: [],
-}
+};
 
 const useData = () => {
     const [samplerShardSize, setSamplerShardSize] = useState(5000);
@@ -199,13 +225,19 @@ const useData = () => {
         const load = async () => {
             setIsLoading(true);
             try {
-                const data = await getFieldStats(fields, query, startTime!, endTime!, samplerShardSize);
+                const data = await getFieldStats(
+                    fields,
+                    query,
+                    startTime!,
+                    endTime!,
+                    samplerShardSize
+                );
                 setData(data);
             } catch (e) {
                 setError(e);
             }
             setIsLoading(false);
-        }
+        };
         if (!error && query && startTime && endTime) {
             load();
         }
@@ -219,9 +251,9 @@ const useData = () => {
         onTimeChange,
         setSamplerShardSize,
         samplerShardSize,
-        query
-    }
-}
+        query,
+    };
+};
 
 interface ListProps {
     isLoading: boolean;
@@ -229,17 +261,23 @@ interface ListProps {
 }
 
 const List: FC<ListProps> = ({ isLoading = false, data }) => {
-    if (isLoading) return (<div>Загурзка</div>);
+    if (isLoading) return <div>Загурзка</div>;
 
-    const {totalCount, fields} = data;
+    const { totalCount, fields } = data;
 
     return (
         <>
-            {fields.map((f, i) => (
-                <FieldStatItem key={f.fieldName} type={f.fieldType} fieldName={f.fieldName} data={f} totalCount={totalCount} />
+            {fields.map((f) => (
+                <FieldStatItem
+                    key={f.fieldName}
+                    type={f.fieldType}
+                    fieldName={f.fieldName}
+                    data={f}
+                    totalCount={totalCount}
+                />
             ))}
         </>
-    )
+    );
 };
 
 export default FieldDataVisualizerPage;

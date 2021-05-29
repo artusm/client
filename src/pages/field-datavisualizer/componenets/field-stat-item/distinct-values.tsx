@@ -1,8 +1,8 @@
-import React, {FC} from "react";
-import {EuiIcon, EuiSpacer, EuiText} from "@elastic/eui";
+import React, { FC } from 'react';
+import { EuiIcon, EuiSpacer, EuiText } from '@elastic/eui';
 
 interface Props {
-    distinctCount?: number
+    distinctCount?: number;
 }
 
 export const DistinctValues: FC<Props> = ({ distinctCount }) => {
@@ -11,15 +11,14 @@ export const DistinctValues: FC<Props> = ({ distinctCount }) => {
             <>
                 <div>
                     <EuiText size="xs" color="subdued">
-                        <EuiIcon type={"database"} />
+                        <EuiIcon type={'database'} />
                         {distinctCount} уникальных значений
                     </EuiText>
                 </div>
-                <EuiSpacer size={"m"} />
+                <EuiSpacer size={'m'} />
             </>
-        )
+        );
     }
 
     return null;
 };
-

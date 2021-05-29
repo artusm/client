@@ -1,16 +1,22 @@
-import React, {FC, useEffect, useState} from "react";
-import {EuiToolTip, EuiFlexItem, EuiFlexGroup, EuiText, EuiProgress,} from "@elastic/eui";
-import classNames from "classnames";
-import {ExpandedRowFieldHeader} from "./field-stat-item/ExampleList";
+import React, { FC} from 'react';
+import {
+    EuiToolTip,
+    EuiFlexItem,
+    EuiFlexGroup,
+    EuiText,
+    EuiProgress,
+} from '@elastic/eui';
+import classNames from 'classnames';
+import { ExpandedRowFieldHeader } from './field-stat-item/ExampleList';
 
 export interface TopValue {
-    key: any,
+    key: any;
     doc_count: number;
 }
 
 interface Props {
-    topValues?: TopValue[]
-    count?: number
+    topValues?: TopValue[];
+    count?: number;
     barColor?: 'primary' | 'secondary' | 'danger' | 'subdued' | 'accent';
 }
 
@@ -36,12 +42,7 @@ function roundToDecimalPlace(num?: number, dp: number = 2): number | string {
     return Math.round(num * m) / m;
 }
 
-
-
-
-
 export const TopValues: FC<Props> = ({ topValues, count, barColor }) => {
-
     const progressBarMax = count;
     return (
         <EuiFlexItem>
@@ -78,7 +79,10 @@ export const TopValues: FC<Props> = ({ topValues, count, barColor }) => {
                         {progressBarMax !== undefined && (
                             <EuiFlexItem
                                 grow={false}
-                                className={classNames('eui-textTruncate', 'mlTopValuesPercentLabelContainer')}
+                                className={classNames(
+                                    'eui-textTruncate',
+                                    'mlTopValuesPercentLabelContainer'
+                                )}
                             >
                                 <EuiText size="xs" textAlign="left" color="subdued">
                                     {getPercentLabel(value.doc_count, progressBarMax)}
@@ -91,5 +95,3 @@ export const TopValues: FC<Props> = ({ topValues, count, barColor }) => {
         </EuiFlexItem>
     );
 };
-
-

@@ -1,21 +1,13 @@
-import {
-    Assign
-} from 'utility-types';
+import { Assign } from 'utility-types';
 import {
     isString,
     isObject as isObjectLodash,
     isPlainObject,
-    sortBy
+    sortBy,
 } from 'lodash';
-import moment, {
-    Moment
-} from 'moment';
-import {
-    find
-} from 'lodash';
-import dateMath, {
-    Unit
-} from '@elastic/datemath';
+import moment, { Moment } from 'moment';
+import { find } from 'lodash';
+import dateMath, { Unit } from '@elastic/datemath';
 
 import {
     convertDurationToNormalizedEsInterval,
@@ -107,8 +99,10 @@ function normalizeMinimumInterval(targetMs: number) {
     return moment.duration(value);
 }
 
-
-export function calcAutoIntervalNear(targetBucketCount: number, duration: number) {
+export function calcAutoIntervalNear(
+    targetBucketCount: number,
+    duration: number
+) {
     const targetPerBucketMs = getPerBucketMs(targetBucketCount, duration);
 
     const lowerBoundIndex = boundsDescending.findIndex(({ bound }) => {
@@ -124,7 +118,10 @@ export function calcAutoIntervalNear(targetBucketCount: number, duration: number
     return normalizeMinimumInterval(targetPerBucketMs);
 }
 
-export function calcAutoIntervalLessThan(maxBucketCount: number, duration: number) {
+export function calcAutoIntervalLessThan(
+    maxBucketCount: number,
+    duration: number
+) {
     const maxPerBucketMs = getPerBucketMs(maxBucketCount, duration);
 
     for (const { interval } of boundsDescending) {
@@ -136,13 +133,14 @@ export function calcAutoIntervalLessThan(maxBucketCount: number, duration: numbe
     return normalizeMinimumInterval(maxPerBucketMs);
 }
 
-
 export interface TimeRangeBounds {
     min: Moment | undefined;
     max: Moment | undefined;
 }
 
-const INTERVAL_STRING_RE = new RegExp('^([0-9\\.]*)\\s*(' + dateMath.units.join('|') + ')$');
+const INTERVAL_STRING_RE = new RegExp(
+    '^([0-9\\.]*)\\s*(' + dateMath.units.join('|') + ')$'
+);
 
 export const splitStringInterval = (interval: string) => {
     if (interval) {
@@ -166,9 +164,15 @@ export function parseInterval(interval: string): moment.Duration | null {
         const { value, unit } = parsedInterval;
         const duration = moment.duration(value, unit);
 
-        const selectedUnit = find(dateMath.units, (u) => Math.abs(duration.as(u)) >= 1) as Unit;
+        const selectedUnit = find(
+            dateMath.units,
+            (u) => Math.abs(duration.as(u)) >= 1
+        ) as Unit;
 
-        if (dateMath.units.indexOf(selectedUnit as any) < dateMath.units.indexOf(unit as any)) {
+        if (
+            dateMath.units.indexOf(selectedUnit as any) <
+            dateMath.units.indexOf(unit as any)
+        ) {
             return duration;
         }
 
@@ -177,7 +181,6 @@ export function parseInterval(interval: string): moment.Duration | null {
         return null;
     }
 }
-
 
 interface TimeBucketsInterval extends moment.Duration {
     description: string;
@@ -295,12 +298,14 @@ export class TimeBuckets {
         }
     }
 
-
     getInterval(useNormalizedEsInterval = true): TimeBucketsInterval {
         const duration = this.getDuration();
         const parsedInterval = isDurationInterval(this._i)
             ? this._i
-            : calcAutoIntervalNear(this._timeBucketConfig['histogram:barTarget'], Number(duration));
+            : calcAutoIntervalNear(
+                this._timeBucketConfig['histogram:barTarget'],
+                Number(duration)
+            );
 
         const maybeScaleInterval = (interval: moment.Duration) => {
             if (!this.hasBounds() || !duration) {
@@ -343,7 +348,9 @@ export class TimeBuckets {
 
             return Object.assign(interval, {
                 description:
-                    esInterval.value === 1 ? prettyUnits : esInterval.value + ' ' + prettyUnits + 's',
+                    esInterval.value === 1
+                        ? prettyUnits
+                        : esInterval.value + ' ' + prettyUnits + 's',
                 esValue: esInterval.value,
                 esUnit: esInterval.unit,
                 expression: esInterval.expression,
@@ -380,16 +387,16 @@ export class TimeBuckets {
 }
 
 export const DEFAULT_CONFIG = {
-    "histogram:maxBars": 15,
-    "histogram:barTarget": 50,
-    "dateFormat:scaled": [
-        ["", "HH:mm:ss.fff"],
-        ["PT1S", "HH:mm:ss"],
-        ["PT1M", "HH:mm"],
-        ["PT1H", "yyyy-MM-dd HH:mm"],
-        ["P1DT", "yyyy-MM-dd"],
-        ["P1MT", "MMMM yyyy"],
-        ["P1YT", "yyyy"]
+    'histogram:maxBars': 15,
+    'histogram:barTarget': 50,
+    'dateFormat:scaled': [
+        ['', 'HH:mm:ss.fff'],
+        ['PT1S', 'HH:mm:ss'],
+        ['PT1M', 'HH:mm'],
+        ['PT1H', 'yyyy-MM-dd HH:mm'],
+        ['P1DT', 'yyyy-MM-dd'],
+        ['P1MT', 'MMMM yyyy'],
+        ['P1YT', 'yyyy'],
     ],
-    dateFormat: "",
+    dateFormat: '',
 };

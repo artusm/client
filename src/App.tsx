@@ -1,11 +1,11 @@
 import React from 'react';
-import './App.css';
-import { LoginPage } from './pages/login';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+
+import { LoginPage } from './pages/login';
 import { OverviewPage } from './pages/overview';
 import { UserListPage } from './pages/user-list';
 import { NewUserPage } from './pages/create-new-user';
-import FieldDataVisualizerPage from './pages/field-datavisualizer/field-datavisualizer_page';
+import { FieldDataVisualizerPage } from './pages/field-datavisualizer';
 import { EditUserPage } from './pages/edit-user';
 import { StatPage } from './pages/stat';
 import { TempMonitoringPage } from './pages/temp-monitoring';
@@ -21,7 +21,7 @@ function App() {
                 <Route path="/users/new" exact={true} component={NewUserPage} />
                 <Route path="/users/:username" exact={true} component={EditUserPage} />
                 <Route
-                    path='/field-stats'
+                    path="/field-stats"
                     exact={true}
                     component={FieldDataVisualizerPage}
                 />

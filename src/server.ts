@@ -1,14 +1,14 @@
-import { Server } from "miragejs";
+import { Server } from 'miragejs';
 
-export function makeServer({ environment = "development" } = {}) {
+export function makeServer({ environment = 'development' } = {}) {
     const createUser = (username) => ({
         enabled: false,
         username,
         email: `${username}@example.com`,
         full_name: username,
         password: username,
-        permissions: ['access_field_analyse']
-    })
+        permissions: ['access_field_analyse'],
+    });
 
     let server = new Server({
         environment,
@@ -22,7 +22,12 @@ export function makeServer({ environment = "development" } = {}) {
                         email: 'test@t.tt',
                         full_name: 'вфывф ывф ы',
                         password: 'test',
-                        permissions: ['edit_users', 'access_anomaly_logs', 'access_field_analyse', 'user_list']
+                        permissions: [
+                            'edit_users',
+                            'access_anomaly_logs',
+                            'access_field_analyse',
+                            'user_list',
+                        ],
                     },
                     createUser('user1'),
                     createUser('user2'),
@@ -38,78 +43,78 @@ export function makeServer({ environment = "development" } = {}) {
                     createUser('user12'),
                     createUser('user13'),
                     createUser('user14'),
-                ]
-            })
+                ],
+            });
         },
 
         routes() {
-            this.namespace = "api";
+            this.namespace = 'api';
             this.timing = 300;
-            this.urlPrefix = 'http://localhost:3000'
+            this.urlPrefix = 'http://localhost:3000';
 
-            this.get("/users", ({db}) => {
-                return db.users
+            this.get('/users', ({ db }) => {
+                return db.users;
             });
 
-            this.get("/users/:username", ({db}, request) => {
-                const {username} = request.params;
+            this.get('/users/:username', ({ db }, request) => {
+                const { username } = request.params;
 
                 return db.users.findBy({
                     username,
-                })
+                });
             });
 
-            this.delete("/users/:ids", ({db}, request) => {
-                const {ids} = request.params;
+            this.delete('/users/:ids', ({ db }, request) => {
+                const { ids } = request.params;
 
                 const idsNumber = ids.split(',');
 
-                idsNumber.forEach(id => db.users.remove(id));
+                idsNumber.forEach((id) => db.users.remove(id));
 
                 return db.users.findBy({
-                    status: true
-                })
+                    status: true,
+                });
             });
 
-            this.post("/users", (schema, request) => {
+            this.post('/users', (schema, request) => {
                 let user = JSON.parse(request.requestBody);
 
                 return {
                     created: true,
-                    user
+                    user,
                 };
-            })
+            });
 
-            this.post("/login", ({db}, request) => {
+            this.post('/login', ({ db }, request) => {
                 let input = JSON.parse(request.requestBody);
 
                 const user = db.users.findBy({
                     enabled: true,
                     username: input.username,
-                    password: input.password
+                    password: input.password,
                 });
 
                 if (user) {
                     return {
                         success: true,
                         user,
-                    }
+                    };
                 }
 
-                return {success: false}
+                return { success: false };
             });
 
-            this.put("/users/:id", ({db}, request) => {
+            this.put('/users/:id', ({ db }, request) => {
                 let user = JSON.parse(request.requestBody);
 
-                db.users.update(request.params.id, user)
+                db.users.update(request.params.id, user);
 
                 return {
                     updated: true,
-                    user
+                    user,
                 };
-            })
-        }
+            });
+        },
     });
 
     // @ts-ignore

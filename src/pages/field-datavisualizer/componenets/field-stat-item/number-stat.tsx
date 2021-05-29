@@ -1,5 +1,5 @@
-import React, {FC} from "react";
-import {EuiFlexGroup, EuiFlexItem} from "@elastic/eui";
+import React, { FC } from 'react';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 interface Props {
     min?: number;
@@ -7,25 +7,19 @@ interface Props {
     max?: number;
 }
 
-export const NumberStat: FC<Props> = ({ min = 0, max = 0, avg = 0}) => {
+export const NumberStat: FC<Props> = ({ min = 0, max = 0, avg = 0 }) => {
     return (
         <>
-            <EuiFlexGroup direction={'column'} gutterSize={'xs'}>
+            <EuiFlexGroup direction="column" gutterSize="xs">
                 <EuiFlexGroup gutterSize="xs">
                     <EuiFlexItem>
-                        <b>
-                            мин.
-                        </b>
+                        <b>мин.</b>
                     </EuiFlexItem>
                     <EuiFlexItem>
-                        <b>
-                            сред.
-                        </b>
+                        <b>сред.</b>
                     </EuiFlexItem>
                     <EuiFlexItem>
-                        <b>
-                            макс.
-                        </b>
+                        <b>макс.</b>
                     </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiFlexGroup gutterSize="xs">
@@ -35,6 +29,5 @@ export const NumberStat: FC<Props> = ({ min = 0, max = 0, avg = 0}) => {
                 </EuiFlexGroup>
             </EuiFlexGroup>
         </>
-    )
+    );
 };
-

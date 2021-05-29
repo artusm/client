@@ -1,18 +1,14 @@
 import client from 'redaxios';
 import { get, find, last, chunk } from 'lodash';
 
-import {
-    FIELD_TYPES
-} from '../common/field_types';
+import { FIELD_TYPES } from '../common/field_types';
 import {
     buildSamplerAggregation,
     getSamplerAggregationsResponsePath,
 } from './query_utils';
-import {
-    stringHash
-} from './string';
-import {Moment} from "moment";
-import {isEmpty} from "./object";
+import { stringHash } from './string';
+import { Moment } from 'moment';
+import { isEmpty } from './object';
 
 const SAMPLER_TOP_TERMS_SHARD_SIZE = 5000;
 
@@ -21,7 +17,10 @@ export interface HistogramField {
     type: typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 }
 
-export function getSafeAggregationName(fieldName: string, index: number): string {
+export function getSafeAggregationName(
+    fieldName: string,
+    index: number
+): string {
     return fieldName.match(/^[a-zA-Z0-9-_.]+$/) ? fieldName : `field_${index}`;
 }
 
@@ -40,7 +39,7 @@ export const getNonTextFieldStats = async (
         () => (count += PERCENTILE_SPACING)
     );
 
-    const aggs = fields.reduce((aggs, field, i) => {
+    const aggs = fields.reduce((aggs, field) => {
         const id = stringHash(field.fieldName);
 
         if (field.type === FIELD_TYPES.NUMBER || field.type === FIELD_TYPES.DATE) {
@@ -67,12 +66,15 @@ export const getNonTextFieldStats = async (
         if (field.type === FIELD_TYPES.KEYWORD) {
             aggs[`${id}_count`] = {
                 value_count: {
-                    field: field.fieldName
-                }
-            }
+                    field: field.fieldName,
+                },
+            };
         }
 
-        if (field.type === FIELD_TYPES.KEYWORD || field.type === FIELD_TYPES.NUMBER) {
+        if (
+            field.type === FIELD_TYPES.KEYWORD ||
+            field.type === FIELD_TYPES.NUMBER
+        ) {
             aggs[`${id}_cardinality`] = {
                 cardinality: {
                     field: field.fieldName,
@@ -88,7 +90,6 @@ export const getNonTextFieldStats = async (
                     },
                 },
             };
-
 
             if (samplerShardSize > 1) {
                 aggs[`${id}_top`] = {
@@ -109,7 +110,7 @@ export const getNonTextFieldStats = async (
 
     const filterCriteria = buildBaseFilterCriteria(earliest, latest, query);
     const { data } = await client.post('http://localhost:9200/li-*/_search', {
-        query:  {
+        query: {
             bool: {
                 filter: filterCriteria,
             },
@@ -121,7 +122,7 @@ export const getNonTextFieldStats = async (
     const aggregations = data.aggregations;
     const aggsPath = getSamplerAggregationsResponsePath(samplerShardSize);
 
-    const stats = fields.map(field => {
+    const stats = fields.map((field) => {
         const id = stringHash(field.fieldName);
         const stats: any = {
             fieldName: field.fieldName,
@@ -153,14 +154,13 @@ export const getNonTextFieldStats = async (
         }
 
         if (field.type === FIELD_TYPES.KEYWORD) {
-            stats.count = get(
-                aggregations,
-                [...aggsPath, `${id}_count`, 'value'],
-                0
-            );
+            stats.count = get(aggregations, [...aggsPath, `${id}_count`, 'value'], 0);
         }
 
-        if (field.type === FIELD_TYPES.KEYWORD || field.type === FIELD_TYPES.NUMBER) {
+        if (
+            field.type === FIELD_TYPES.KEYWORD ||
+            field.type === FIELD_TYPES.NUMBER
+        ) {
             const topAggsPath = [...aggsPath, `${id}_top`];
             if (samplerShardSize > 1) {
                 topAggsPath.push('top');
@@ -184,10 +184,12 @@ export const getNonTextFieldStats = async (
                     [...aggsPath, `${id}_percentiles`, 'values'],
                     []
                 );
-                const medianPercentile: { value: number; key: number } | undefined = find(percentiles, {
-                    key: 50,
-                });
-                stats.median = medianPercentile !== undefined ? medianPercentile!.value : 0;
+                const medianPercentile: { value: number; key: number } | undefined =
+                    find(percentiles, {
+                        key: 50,
+                    });
+                stats.median =
+                    medianPercentile !== undefined ? medianPercentile!.value : 0;
                 stats.distribution = processDistributionData(
                     percentiles,
                     PERCENTILE_SPACING,
@@ -197,11 +199,10 @@ export const getNonTextFieldStats = async (
         }
 
         return stats;
-    })
+    });
 
     return stats;
 };
-
 
 const getFieldExamples = async (
     field: HistogramField,
@@ -211,11 +212,15 @@ const getFieldExamples = async (
     samplerShardSize: number,
     maxExamples = 10
 ) => {
-    const filterCriteria: any[] = buildBaseFilterCriteria(earliest, latest, query);
+    const filterCriteria: any[] = buildBaseFilterCriteria(
+        earliest,
+        latest,
+        query
+    );
 
     filterCriteria.push({
         exists: {
-            field: field.fieldName
+            field: field.fieldName,
         } as any,
     } as any);
 
@@ -233,12 +238,15 @@ const getFieldExamples = async (
         fieldName: field.fieldName,
         fieldType: field.type,
         examples: [] as any[],
-    }
+    };
 
     if (data.hits.total.value > 0) {
         const hits = data.hits.hits;
         for (let i = 0; i < hits.length; i++) {
-            const example: object[] | undefined = get(hits[i]._source, field.fieldName);
+            const example: object[] | undefined = get(
+                hits[i]._source,
+                field.fieldName
+            );
 
             if (example !== undefined && stats.examples.indexOf(example) === -1) {
                 stats.examples.push(example);
@@ -250,17 +258,17 @@ const getFieldExamples = async (
     }
 
     return [stats];
-}
+};
 
 const getTotalCount = async (
     query: any,
     earliest: Moment | undefined,
-    latest: Moment | undefined,
+    latest: Moment | undefined
 ) => {
     const filterCriteria = buildBaseFilterCriteria(earliest, latest, query);
     const { data } = await client.post('http://localhost:9200/li-*/_search', {
-        "size": 0,
-        "track_total_hits": true,
+        size: 0,
+        track_total_hits: true,
         query: {
             bool: {
                 filter: filterCriteria,
@@ -269,9 +277,9 @@ const getTotalCount = async (
     });
 
     return {
-        totalCount: get(data, ['hits', 'total', 'value'], 0)
-    }
-}
+        totalCount: get(data, ['hits', 'total', 'value'], 0),
+    };
+};
 
 export const getFieldStats = async (
     fields: HistogramField[],
@@ -280,38 +288,44 @@ export const getFieldStats = async (
     latest: Moment | undefined,
     samplerShardSize: number = -1
 ) => {
-    const nonTextFields = fields.filter((field) => field.type !== FIELD_TYPES.TEXT);
+    const nonTextFields = fields.filter(
+        (field) => field.type !== FIELD_TYPES.TEXT
+    );
     const textFields = fields.filter((field) => field.type === FIELD_TYPES.TEXT);
 
     const promisses: Promise<any>[] = [];
     const result = {
         totalCount: 0,
-        fields: []
+        fields: [],
     };
 
     promisses.push(getTotalCount(query, earliest, latest));
 
-    chunk(nonTextFields, 17).forEach((fields) => {
-        promisses.push(getNonTextFieldStats(fields, query, earliest, latest, samplerShardSize));
-    })
+    chunk(nonTextFields, 5).forEach((fields) => {
+        promisses.push(
+            getNonTextFieldStats(fields, query, earliest, latest, samplerShardSize)
+        );
+    });
 
-    textFields.forEach(field => {
-        promisses.push(getFieldExamples(field, query, earliest, latest, samplerShardSize))
-    })
+    textFields.forEach((field) => {
+        promisses.push(
+            getFieldExamples(field, query, earliest, latest, samplerShardSize)
+        );
+    });
 
     const stats = await Promise.all(promisses);
 
     stats.forEach((s) => {
         if (Array.isArray(s)) {
             // @ts-ignore
-            result.fields.push(...s)
+            result.fields.push(...s);
         } else if (s && 'totalCount' in s) {
-            result.totalCount = s.totalCount
+            result.totalCount = s.totalCount;
         }
-    })
+    });
 
     return result;
-}
+};
 
 interface Distribution {
     percentiles: any[];
@@ -348,7 +362,11 @@ const processDistributionData = (
     percentileSpacing: number,
     minValue: number
 ): Distribution => {
-    const distribution: Distribution = { percentiles: [], minPercentile: 0, maxPercentile: 100 };
+    const distribution: Distribution = {
+        percentiles: [],
+        minPercentile: 0,
+        maxPercentile: 100,
+    };
     if (percentiles.length === 0) {
         return distribution;
     }
@@ -428,5 +446,4 @@ const processDistributionData = (
     }
 
     return distribution;
-}
-
+};

@@ -1,20 +1,22 @@
-import React, {FC, useEffect, useState} from 'react';
-import {EuiSelectable, EuiBadge} from "@elastic/eui";
-import {loadEslList} from "../../../query/load-esl-list";
+import React, { FC, useEffect, useState } from 'react';
+import { EuiSelectable, EuiBadge } from '@elastic/eui';
+import { loadEslList } from '../../../query/load-esl-list';
 
 interface Props {
-    onChangeEsl: (esl: number) => void
-    isGlobalLoading: boolean
+    onChangeEsl: (esl: number) => void;
+    isGlobalLoading: boolean;
 }
 
-export const EslList: FC<Props> = ({onChangeEsl = () => {}, isGlobalLoading = false}) => {
+export const EslList: FC<Props> = ({
+                                       onChangeEsl = () => {},
+                                       isGlobalLoading = false,
+                                   }) => {
     const [isLoading, setIsloading] = useState(true);
     const [options, setOptions] = useState([]);
 
     useEffect(() => {
         const load = async () => {
             const esls = await loadEslList();
-
 
             const options = esls.map((b) => ({
                 label: `${b.esl}`,
@@ -31,20 +33,21 @@ export const EslList: FC<Props> = ({onChangeEsl = () => {}, isGlobalLoading = fa
     }, []);
 
     const onChange = (options) => {
-       const esl = options.find((o) => o.checked === "on");
+        const esl = options.find((o) => o.checked === 'on');
 
-       if (onChangeEsl) {
-           onChangeEsl(esl.esl);
-       }
+        if (onChangeEsl) {
+            onChangeEsl(esl.esl);
+        }
     };
-
 
     return (
         <EuiSelectable
             searchable
             isLoading={isLoading || isGlobalLoading}
             options={options}
-            loadingMessage={isGlobalLoading ? "Загружаются данные" : "Идет загрузка esl"}
+            loadingMessage={
+                isGlobalLoading ? 'Загружаются данные' : 'Идет загрузка esl'
+            }
             singleSelection={true}
             onChange={onChange}
         >
@@ -56,4 +59,4 @@ export const EslList: FC<Props> = ({onChangeEsl = () => {}, isGlobalLoading = fa
             )}
         </EuiSelectable>
     );
-}
+};

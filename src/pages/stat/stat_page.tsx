@@ -14,15 +14,13 @@ import {
 import { QueryContainer } from '@elastic/eui/src/components/search_bar/query/ast_to_es_query_dsl';
 import client from 'redaxios';
 import { get } from 'get-wild';
-import { merge } from 'lodash';
 import Chart from 'react-apexcharts';
 
 import SearchBar from '../../components/search-bar';
 import { Datepicker } from '../../components/datepicker';
 import { convertDatesToLocal } from '../../utils/date';
 import { DEFAULT_CONFIG, TimeBuckets } from '../../utils/time_buckets';
-import {isEmpty} from "../../utils/object";
-import {buildBaseFilterCriteria} from "../../utils/agg-intervals";
+import { buildBaseFilterCriteria } from '../../utils/agg-intervals';
 
 const loadData = async (query: QueryContainer, startTime, endTime) => {
     const timeBuckets = new TimeBuckets(DEFAULT_CONFIG);
@@ -33,7 +31,6 @@ const loadData = async (query: QueryContainer, startTime, endTime) => {
     });
 
     let filterCriteria = buildBaseFilterCriteria(startTime, endTime, query);
-
 
     const { data } = await client.post('http://localhost:9200/li-*/_search', {
         size: 0,
@@ -91,7 +88,7 @@ const useData = () => {
                     const data = await loadData(query, startTime, endTime);
                     setData(data);
                 } catch (e) {
-                    setError(e)
+                    setError(e);
                 }
 
                 setIsLoading(false);
@@ -112,7 +109,7 @@ const useData = () => {
 };
 
 const StatPage = () => {
-    const { isLoading, data, onTimeChange, onSearch, error, query } = useData();
+    const { isLoading, data, onTimeChange, onSearch, error } = useData();
 
     return (
         <>
@@ -154,8 +151,6 @@ const StatPage = () => {
                                     title={`Ошибка при поиске: ${error?.message}`}
                                 />
                             )}
-                            {JSON.stringify(query)}
-                            {JSON.stringify(data)}
                             {data && (
                                 <Chart
                                     // @ts-ignore
@@ -184,17 +179,16 @@ function getOptions(data) {
                 speed: 800,
                 animateGradually: {
                     enabled: true,
-                    delay: 150
+                    delay: 150,
                 },
                 dynamicAnimation: {
                     enabled: true,
-                    speed: 350
-                }
-            }
+                    speed: 350,
+                },
+            },
         },
         dataLabels: {
             enabled: false,
-
         },
         stroke: {
             curve: 'smooth',
@@ -204,8 +198,8 @@ function getOptions(data) {
             categories: data.dates,
             labels: {
                 datetimeUTC: false,
-                format: data.dateFormat
-            }
+                format: data.dateFormat,
+            },
         },
         tooltip: {
             theme: 'dark',

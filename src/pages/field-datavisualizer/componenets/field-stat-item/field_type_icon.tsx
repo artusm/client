@@ -13,10 +13,7 @@ interface FieldTypeIconContainerProps {
     [key: string]: any;
 }
 
-export const FieldTypeIcon: FC<FieldTypeIconProps> = ({
-    type,
-    fieldName,
-}) => {
+export const FieldTypeIcon: FC<FieldTypeIconProps> = ({ type, fieldName }) => {
     let iconType = 'questionInCircle';
     let color = 'euiColorVis6';
 
@@ -47,10 +44,7 @@ export const FieldTypeIcon: FC<FieldTypeIconProps> = ({
     };
 
     return (
-        <EuiToolTip
-            position="left"
-            content={`Тип: ${type}`}
-        >
+        <EuiToolTip position="left" content={`Тип: ${type}`}>
             <FieldTypeIconContainer {...containerProps} />
         </EuiToolTip>
     );
@@ -63,9 +57,9 @@ const FieldTypeIconContainer: FC<FieldTypeIconContainerProps> = ({
 }) => {
     return (
         <span {...rest}>
-            <span className="field-type-icon">
-                <EuiToken iconType={iconType} shape="square" size="s" color={color} />
-            </span>
-        </span>
+			<span className="field-type-icon">
+				<EuiToken iconType={iconType} shape="square" size="s" color={color} />
+			</span>
+		</span>
     );
 };

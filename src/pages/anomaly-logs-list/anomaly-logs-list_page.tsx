@@ -1,26 +1,30 @@
-import Header from "../../components/root/Header";
+import Header from '../../components/root/Header';
 import {
     EuiCallOut,
-    EuiFlexGroup, EuiFlexItem,
+    EuiFlexGroup,
+    EuiFlexItem,
     EuiPage,
     EuiPageBody,
     EuiPageContent,
     EuiPageContentBody,
     EuiPageHeader,
     EuiSearchBar,
-    EuiBasicTable, EuiButtonIcon
-} from "@elastic/eui";
-import {get} from 'lodash';
+    EuiBasicTable,
+    EuiButtonIcon,
+    EuiLoadingContent,
+    EuiText,
+} from '@elastic/eui';
+import { get } from 'lodash';
 
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
-import React, {useEffect, useState} from "react";
-import SearchBar from "../../components/search-bar";
-import {Datepicker} from "../../components/datepicker";
-import {QueryContainer} from "@elastic/eui/src/components/search_bar/query/ast_to_es_query_dsl";
-import client from "redaxios";
-import {buildBaseFilterCriteria} from "../../utils/agg-intervals";
-import moment, {Moment} from "moment";
-import ReactJson from 'react-json-view'
+import React, { useEffect, useState } from 'react';
+import SearchBar from '../../components/search-bar';
+import { Datepicker } from '../../components/datepicker';
+import { QueryContainer } from '@elastic/eui/src/components/search_bar/query/ast_to_es_query_dsl';
+import client from 'redaxios';
+import { buildBaseFilterCriteria } from '../../utils/agg-intervals';
+import moment, { Moment } from 'moment';
+import ReactJson from 'react-json-view';
 
 interface LoadDataOptions {
     earliest: Moment;
@@ -30,18 +34,25 @@ interface LoadDataOptions {
     pageIndex: number;
     sorting: {
         field: string;
-        direction: string
-    }
+        direction: string;
+    };
 }
 
-const loadData = async ({earliest, latest, pageSize, query, pageIndex, sorting}: LoadDataOptions) => {
+const loadData = async ({
+                            earliest,
+                            latest,
+                            pageSize,
+                            query,
+                            pageIndex,
+                            sorting,
+                        }: LoadDataOptions) => {
     let filterCriteria = buildBaseFilterCriteria(earliest, latest, query);
 
-    // filterCriteria.push({
-    //     exists: {
-    //         field: ''
-    //     } as any,
-    // } as any);
+    filterCriteria.push({
+        exists: {
+            field: 'anomaly_category',
+        } as any,
+    } as any);
 
     const from = pageSize * pageIndex;
 
@@ -55,9 +66,9 @@ const loadData = async ({earliest, latest, pageSize, query, pageIndex, sorting}:
         },
         sort: [
             {
-                [sorting.field]: sorting.direction
-            }
-        ]
+                [sorting.field]: sorting.direction,
+            },
+        ],
     });
 
     const hits = get(data, 'hits.hits', []);
@@ -67,7 +78,7 @@ const loadData = async ({earliest, latest, pageSize, query, pageIndex, sorting}:
         items: hits.map((hit) => ({
             id: hit._id,
             '@timestamp': moment(get(hit, '_source.@timestamp')).calendar(),
-            category: '',
+            category: get(hit, '_source.anomaly_category'),
             hit: hit,
         })),
     };
@@ -84,8 +95,8 @@ const useData = () => {
     const [sortDirection, setSortDirection] = useState('desc');
     const [pageSize, setPageSize] = useState(10);
     const [query, setQuery] = useState({});
-    const [earliest, setEarliest] = useState<Moment|null>(null);
-    const [latest, setLatest] = useState<Moment|null>(null);
+    const [earliest, setEarliest] = useState<Moment | null>(null);
+    const [latest, setLatest] = useState<Moment | null>(null);
 
     const onTableChange = ({ page = {}, sort = {} }) => {
         const { index: pageIndex, size: pageSize }: any = page;
@@ -97,7 +108,6 @@ const useData = () => {
         setSortField(sortField);
         setSortDirection(sortDirection);
     };
-
 
     const onTimeChange = (start, end) => {
         setEarliest(start);
@@ -116,7 +126,7 @@ const useData = () => {
             setLoading(true);
             setItemIdToExpandedRowMap({});
             try {
-                const {items, total} = await loadData({
+                const { items, total } = await loadData({
                     earliest: earliest!,
                     latest: latest!,
                     pageSize,
@@ -139,7 +149,7 @@ const useData = () => {
         if (earliest && latest) {
             load();
         }
-    }, [query, pageSize, sortField, sortDirection, pageIndex, earliest, latest])
+    }, [query, pageSize, sortField, sortDirection, pageIndex, earliest, latest]);
 
     const toggleDetails = (item) => {
         const itemIdToExpandedRowMapValues = { ...itemIdToExpandedRowMap };
@@ -151,7 +161,7 @@ const useData = () => {
             itemIdToExpandedRowMapValues[id] = (
                 <ReactJson src={hit} theme="railscasts" name={false} />
             );
-        };
+        }
 
         setItemIdToExpandedRowMap(itemIdToExpandedRowMapValues);
     };
@@ -174,40 +184,57 @@ const useData = () => {
             sort: {
                 field: sortField,
                 direction: sortDirection,
-            }
+            },
         },
         onTimeChange,
         onSearch,
-        itemIdToExpandedRowMap
-    }
-}
+        itemIdToExpandedRowMap,
+    };
+};
+
+const CATEGORIES = {
+    emptyStatus: 'Пустой status',
+    doubleLog: 'Двойной лог',
+};
 
 const searchFilters = [
     {
-        type: "field_value_selection",
-        field: "log_type",
-        name: "Категория",
-        operator: "eq",
+        type: 'field_value_selection',
+        field: 'log_type',
+        name: 'Категория',
+        operator: 'eq',
         multiSelect: 'or',
-        options: [{
-            value: 'emptyStatus',
-            name: 'Пустой status'
-        }, {
-            value: 'doubleLog',
-            name: 'Двойной лог'
-        }].map(({value, name}) => ({
+        options: [
+            {
+                value: 'emptyStatus',
+                name: 'Пустой status',
+            },
+            {
+                value: 'doubleLog',
+                name: 'Двойной лог',
+            },
+        ].map(({ value, name }) => ({
             value: value,
-            view: (
-                <span className="eui-textTruncate eui-displayBlock">{name}</span>
-            ),
+            view: <span className="eui-textTruncate eui-displayBlock">{name}</span>,
         })),
-        loadingMessage: "Загрузка...",
+        loadingMessage: 'Загрузка...',
         cache: 10000,
     },
-]
+];
 
 const AnomalyLogsList = () => {
-    const {error, onSearch, onTimeChange, items, isLoading, onTableChange, toggleDetails, pagination, sorting, itemIdToExpandedRowMap} = useData();
+    const {
+        error,
+        onSearch,
+        onTimeChange,
+        items,
+        isLoading,
+        onTableChange,
+        toggleDetails,
+        pagination,
+        sorting,
+        itemIdToExpandedRowMap,
+    } = useData();
 
     return (
         <>
@@ -220,10 +247,7 @@ const AnomalyLogsList = () => {
             />
             <EuiPage paddingSize="none">
                 <EuiPageBody panelled>
-                    <EuiPageHeader
-                        iconType="sqlApp"
-                        pageTitle="Логи с аномалиями"
-                    />
+                    <EuiPageHeader iconType="sqlApp" pageTitle="Логи с аномалиями" />
 
                     <EuiPageContent
                         hasBorder={false}
@@ -239,7 +263,11 @@ const AnomalyLogsList = () => {
                                 </EuiFlexItem>
 
                                 <EuiFlexItem grow={false}>
-                                    <Datepicker isLoading={isLoading} onChange={onTimeChange} />
+                                    <Datepicker
+                                        isLoading={isLoading}
+                                        onChange={onTimeChange}
+                                        defaultStart="now-1h"
+                                    />
                                 </EuiFlexItem>
                             </EuiFlexGroup>
                             {error && (
@@ -249,17 +277,39 @@ const AnomalyLogsList = () => {
                                     title={`Ошибка при поиске: ${error?.message}`}
                                 />
                             )}
-                            <Table onTableChange={onTableChange} isLoading={isLoading} sorting={sorting} items={items} itemIdToExpandedRowMap={itemIdToExpandedRowMap} pagination={pagination} toggleDetails={toggleDetails} />
+                            {isLoading ? (
+                                <EuiLoadingContent lines={1} />
+                            ) : (
+                                <EuiText grow={false}>
+                                    Всего: <b>{pagination.totalItemCount}</b>
+                                </EuiText>
+                            )}
+                            <Table
+                                onTableChange={onTableChange}
+                                isLoading={isLoading}
+                                sorting={sorting}
+                                items={items}
+                                itemIdToExpandedRowMap={itemIdToExpandedRowMap}
+                                pagination={pagination}
+                                toggleDetails={toggleDetails}
+                            />
                         </EuiPageContentBody>
                     </EuiPageContent>
                 </EuiPageBody>
             </EuiPage>
         </>
-    )
-}
+    );
+};
 
-
-const Table = ({onTableChange, sorting, items, itemIdToExpandedRowMap, pagination, toggleDetails, isLoading}) => {
+const Table = ({
+    onTableChange,
+    sorting,
+    items,
+    itemIdToExpandedRowMap,
+    pagination,
+    toggleDetails,
+    isLoading,
+}) => {
     const columns = [
         {
             field: '@timestamp',
@@ -281,6 +331,7 @@ const Table = ({onTableChange, sorting, items, itemIdToExpandedRowMap, paginatio
             field: 'category',
             name: 'Категория',
             truncateText: true,
+            render: (category) => <span>{CATEGORIES[category]}</span>,
         },
         {
             align: RIGHT_ALIGNMENT,
@@ -292,7 +343,7 @@ const Table = ({onTableChange, sorting, items, itemIdToExpandedRowMap, paginatio
                     iconType={itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
                 />
             ),
-        }
+        },
     ];
     return (
         <EuiBasicTable
@@ -307,7 +358,7 @@ const Table = ({onTableChange, sorting, items, itemIdToExpandedRowMap, paginatio
             sorting={sorting}
             onChange={onTableChange}
         />
-    )
+    );
 };
 
 export default AnomalyLogsList;

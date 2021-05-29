@@ -1,6 +1,6 @@
-import React, {useState, useMemo, FC} from "react";
-import Header from "../../components/root/Header";
-import useSWR, { mutate } from "swr";
+import React, { useState, useMemo, FC } from 'react';
+import Header from '../../components/root/Header';
+import useSWR, { mutate } from 'swr';
 import {
     EuiPage,
     EuiPageContent,
@@ -14,26 +14,26 @@ import {
     EuiHealth,
     EuiSuperSelect,
     EuiFieldText,
-    EuiComboBox
-} from "@elastic/eui";
-import { useForm } from "react-hook-form";
-import { useHistory, useParams } from "react-router";
-import {useServer} from "../../utils/server";
+    EuiComboBox,
+} from '@elastic/eui';
+import { useForm } from 'react-hook-form';
+import { useHistory, useParams } from 'react-router';
+import { useServer } from '../../utils/server';
 
 const OverviewPage = () => {
     useServer();
     // @ts-ignore
     const { username } = useParams();
-    const {data} = useSWR(`/api/users/${username}`);
+    const { data } = useSWR(`/api/users/${username}`);
     return (
         <>
             <Header
                 breadcrumbs={[
                     {
-                        text: "Список пользователей",
+                        text: 'Список пользователей',
                     },
                     {
-                        text: "Редактирование пользователя",
+                        text: 'Редактирование пользователя',
                     },
                 ]}
             />
@@ -64,17 +64,17 @@ const OverviewPage = () => {
 
 const options = [
     {
-        value: "true",
+        value: 'true',
         inputDisplay: (
-            <EuiHealth color="success" style={{ lineHeight: "inherit" }}>
+            <EuiHealth color="success" style={{ lineHeight: 'inherit' }}>
                 Активен
             </EuiHealth>
         ),
     },
     {
-        value: "false",
+        value: 'false',
         inputDisplay: (
-            <EuiHealth color="danger" style={{ lineHeight: "inherit" }}>
+            <EuiHealth color="danger" style={{ lineHeight: 'inherit' }}>
                 Диактивен
             </EuiHealth>
         ),
@@ -97,26 +97,30 @@ const accessOptions = [
     {
         label: 'Доступ к списку пользователей',
         value: 'user_list',
-    }
-]
+    },
+];
 interface User {
     id: string;
-    enabled?: boolean
+    enabled?: boolean;
     username: string;
     password: string;
     full_name: string;
     permissions: string[];
-    email: string
+    email: string;
 }
 
 interface Props {
-    user?: User
+    user?: User;
 }
-const EditUserForm: FC<Props> = ({user}) => {
-    const [enabled, setEnabled] = useState(() => user?.enabled ? 'true' : 'false');
+const EditUserForm: FC<Props> = ({ user }) => {
+    const [enabled, setEnabled] = useState(() =>
+        user?.enabled ? 'true' : 'false'
+    );
     const [accesses, setAccesses] = useState<any>(() => {
         if (user?.permissions) {
-            return user.permissions.map((p) => accessOptions.find((a) => p === a.value));
+            return user.permissions.map((p) =>
+                accessOptions.find((a) => p === a.value)
+            );
         }
 
         return [];
@@ -129,13 +133,13 @@ const EditUserForm: FC<Props> = ({user}) => {
         setIsLoading(true);
 
         const data = await fetch(`/api/users/${user!.id}`, {
-            method: "PUT",
+            method: 'PUT',
             headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                enabled: enabled === "true",
+                enabled: enabled === 'true',
                 email,
                 username,
                 password,
@@ -146,10 +150,10 @@ const EditUserForm: FC<Props> = ({user}) => {
 
         setIsLoading(false);
         const json: any = await data.json();
-        console.log(json)
+        console.log(json);
         if (json.updated) {
-            mutate("/api/users");
-            mutate(`/api/users/${user!.id}`)
+            mutate('/api/users');
+            mutate(`/api/users/${user!.id}`);
             history.push(`/users`);
         } else if (json.errors) {
         }
@@ -178,7 +182,6 @@ const EditUserForm: FC<Props> = ({user}) => {
             component="form"
             onSubmit={handleSubmit(onSubmit)}
         >
-            {JSON.stringify(user)}
             <EuiFormRow
                 label="Имя пользователя"
                 isInvalid={!!errors.username}
@@ -187,26 +190,26 @@ const EditUserForm: FC<Props> = ({user}) => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.username}
-                    icon={"user"}
+                    icon={'user'}
                     defaultValue={user?.username}
-                    {...register("username", {
+                    {...register('username', {
                         required: {
                             value: true,
-                            message: "Поле с именем пользователя не может быть пустым",
+                            message: 'Поле с именем пользователя не может быть пустым',
                         },
                         minLength: {
                             value: 5,
                             message:
-                                "Минимальная длина поля с именем пользователя 5 символов",
+                                'Минимальная длина поля с именем пользователя 5 символов',
                         },
                         maxLength: {
                             value: 20,
                             message:
-                                "Максимальная длина поля с именем пользователя 20 символов",
+                                'Максимальная длина поля с именем пользователя 20 символов',
                         },
                         pattern: {
                             value: /^[A-Za-z0-9]+$/,
-                            message: "Только символы и цифры",
+                            message: 'Только символы и цифры',
                         },
                     })}
                 />
@@ -214,9 +217,9 @@ const EditUserForm: FC<Props> = ({user}) => {
             <EuiFormRow label="Имя">
                 <EuiFieldText
                     disabled={isLoading}
-                    icon={"user"}
+                    icon={'user'}
                     defaultValue={user?.full_name}
-                    {...register("full_name")}
+                    {...register('full_name')}
                 />
             </EuiFormRow>
             <EuiFormRow
@@ -228,16 +231,16 @@ const EditUserForm: FC<Props> = ({user}) => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.email}
-                    icon={"email"}
+                    icon={'email'}
                     defaultValue={user?.email}
-                    {...register("email", {
+                    {...register('email', {
                         required: {
                             value: true,
-                            message: "Поле с почтой не может быть пустым",
+                            message: 'Поле с почтой не может быть пустым',
                         },
                         pattern: {
                             value: /\S+@\S+\.\S+/,
-                            message: "Некорректная почта",
+                            message: 'Некорректная почта',
                         },
                     })}
                 />
@@ -268,7 +271,7 @@ const EditUserForm: FC<Props> = ({user}) => {
             </EuiFormRow>
             <EuiSpacer />
 
-            <EuiButton type={"submit"} isLoading={isLoading}>
+            <EuiButton type={'submit'} isLoading={isLoading}>
                 Обновить
             </EuiButton>
         </EuiForm>

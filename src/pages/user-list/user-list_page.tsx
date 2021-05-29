@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import Header from "../../components/root/Header";
+import React, { useState } from 'react';
+import Header from '../../components/root/Header';
 import {
     EuiAvatar,
     EuiIcon,
@@ -8,22 +8,21 @@ import {
     EuiPageContent,
     EuiPageContentBody,
     EuiPageHeader,
-    EuiBasicTable,
     EuiInMemoryTable,
     EuiButton,
-    EuiHealth, EuiEmptyPrompt,
-} from "@elastic/eui";
-import useSWR, {mutate} from "swr";
-import Link from "../../components/Link";
-import { useHistory } from "react-router";
-import {makeServer} from "../../server";
-import {useServer} from "../../utils/server";
+    EuiHealth,
+    EuiEmptyPrompt,
+} from '@elastic/eui';
+import useSWR from 'swr';
+import Link from '../../components/Link';
+import { useHistory } from 'react-router';
+import { useServer } from '../../utils/server';
 
 const AddNewUserButton = () => {
     const history = useHistory();
 
     const onClick = () => {
-        history.push("/users/new");
+        history.push('/users/new');
     };
 
     return <EuiButton onClick={onClick}>Добавить нового пользователя</EuiButton>;
@@ -36,7 +35,7 @@ const UserListPage = () => {
             <Header
                 breadcrumbs={[
                     {
-                        text: "Список пользователей",
+                        text: 'Список пользователей',
                     },
                 ]}
             />
@@ -68,8 +67,8 @@ const UserListPage = () => {
 
 const actions = [
     {
-        name: "Редактировать",
-        description: "Редактировать этого пользователя",
+        name: 'Редактировать',
+        description: 'Редактировать этого пользователя',
         render: (item) => (
             <Link to={`/users/${item.username}`}>
                 <EuiIcon type="gear" />
@@ -80,8 +79,8 @@ const actions = [
 
 const columns = [
     {
-        field: "username",
-        name: "Имя пользователя",
+        field: 'username',
+        name: 'Имя пользователя',
         sortable: true,
         mobileOptions: {
             render: (item) => <span>{item.username}</span>,
@@ -92,13 +91,13 @@ const columns = [
         },
         render: (username) => (
             <span>
-        <EuiAvatar size="s" name={username} /> {username}
-      </span>
+				<EuiAvatar size="s" name={username} /> {username}
+			</span>
         ),
     },
     {
-        field: "full_name",
-        name: "Имя",
+        field: 'full_name',
+        name: 'Имя',
         truncateText: true,
         mobileOptions: {
             show: false,
@@ -106,16 +105,16 @@ const columns = [
         sortable: true,
     },
     {
-        field: "email",
-        name: "Почта",
+        field: 'email',
+        name: 'Почта',
     },
     {
-        field: "enabled",
-        name: "Статус",
-        dataType: "boolean",
+        field: 'enabled',
+        name: 'Статус',
+        dataType: 'boolean',
         render: (enabled) => {
-            const color = enabled ? "success" : "danger";
-            const label = enabled ? "Активен" : "Не активен";
+            const color = enabled ? 'success' : 'danger';
+            const label = enabled ? 'Активен' : 'Не активен';
             return <EuiHealth color={color}>{label}</EuiHealth>;
         },
         footer: ({ items, pagination }) => {
@@ -128,14 +127,13 @@ const columns = [
         sortable: true,
     },
     {
-        name: "Дейсвия",
-        field: "__",
+        name: 'Дейсвия',
+        field: '__',
         actions,
     },
 ];
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 
 const pagination = {
     initialPageSize: 5,
@@ -143,19 +141,19 @@ const pagination = {
 };
 
 const UserList = () => {
-    const { data, mutate } = useSWR("/api/users", fetcher, {
+    const { data, mutate } = useSWR('/api/users', fetcher, {
         onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
-            setTimeout(() => revalidate({ retryCount }), 50)
-        }
+            setTimeout(() => revalidate({ retryCount }), 50);
+        },
     });
     const [selection, setSelection] = useState([]);
-    const [message, setMessage] = useState(
-        () => <EuiEmptyPrompt
+    const [message, setMessage] = useState(() => (
+        <EuiEmptyPrompt
             title={<h3>Загрузка пользователей</h3>}
             titleSize="xs"
             body="Идет загрузка пользователей"
         />
-    );
+    ));
 
     const items = data ? data : [];
     const isLoading = !data;
@@ -170,8 +168,8 @@ const UserList = () => {
 
     const deleteUsers = async () => {
         if (window.confirm('Удалить')) {
-            const url = `/api/users/${selection.map(({id}) => id).join()}`
-            console.log(url)
+            const url = `/api/users/${selection.map(({ id }) => id).join()}`;
+            console.log(url);
             await fetch(url, {
                 method: 'DELETE',
                 headers: {
@@ -181,7 +179,7 @@ const UserList = () => {
             });
             mutate();
         }
-    }
+    };
 
     const renderDeleteButton = () => {
         if (selection.length === 0) {

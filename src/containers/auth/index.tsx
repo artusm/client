@@ -1,5 +1,5 @@
 import createContainer from 'constate';
-import {useState} from "react";
+import { useState } from 'react';
 
 export const useAuth = () => {
     const [currentUser, setCurrentUser] = useState({});
@@ -9,7 +9,7 @@ export const useAuth = () => {
         isLoading,
         currentUser,
         setCurrentUser,
-    }
+    };
 };
 
 export const [AuthProvider, useAuthContext] = createContainer(useAuth);

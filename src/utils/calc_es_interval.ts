@@ -12,9 +12,7 @@ export class InvalidEsCalendarIntervalError extends Error {
         public readonly unit: Unit,
         public readonly type: string
     ) {
-        super(
-            `Invalid calendar interval: ${interval}, value must be 1`
-        );
+        super(`Invalid calendar interval: ${interval}, value must be 1`);
 
         this.name = 'InvalidEsCalendarIntervalError';
         this.value = value;
@@ -31,9 +29,7 @@ export class InvalidEsCalendarIntervalError extends Error {
 
 export class InvalidEsIntervalFormatError extends Error {
     constructor(public readonly interval: string) {
-        super(
-            `Invalid interval format: ${interval}`
-        );
+        super(`Invalid interval format: ${interval}`);
 
         this.name = 'InvalidEsIntervalFormatError';
 
@@ -44,8 +40,6 @@ export class InvalidEsIntervalFormatError extends Error {
         Object.setPrototypeOf(this, InvalidEsIntervalFormatError.prototype);
     }
 }
-
-export type ParsedInterval = ReturnType<typeof parseEsInterval>;
 
 export function parseEsInterval(interval: string) {
     const matches = String(interval).trim().match(ES_INTERVAL_STRING_REGEX);
@@ -80,7 +74,6 @@ export interface EsInterval {
     unit: Unit;
     value: number;
 }
-
 
 export function convertDurationToNormalizedEsInterval(
     duration: moment.Duration,

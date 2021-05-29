@@ -1,18 +1,21 @@
-import React, {FC, useEffect, useState} from 'react';
-import {EuiSuperDatePicker} from "@elastic/eui";
+import React, { FC, useEffect, useState } from 'react';
+import { EuiSuperDatePicker } from '@elastic/eui';
 import dateMath from '@elastic/datemath';
-import {Moment} from "moment";
+import { Moment } from 'moment';
 
 interface Props {
     isLoading: boolean;
     onChange?: (start: Moment, end: Moment) => void;
 }
 
-export const Datepicker: FC<Props> = ({isLoading = false, onChange = () => {}}) => {
+export const Datepicker: FC<Props> = ({
+                                          isLoading = false,
+                                          onChange = () => {},
+                                      }) => {
     const [start, setStart] = useState('now-30m');
     const [end, setEnd] = useState('now');
 
-    const onTimeChange = ({start, end}) => {
+    const onTimeChange = ({ start, end }) => {
         setStart(start);
         setEnd(end);
         const startMoment = dateMath.parse(start);
@@ -27,14 +30,13 @@ export const Datepicker: FC<Props> = ({isLoading = false, onChange = () => {}}) 
         }
 
         if (onChange) {
-            onChange(startMoment.utc(), endMoment.utc())
+            onChange(startMoment.utc(), endMoment.utc());
         }
     };
 
     useEffect(() => {
-        onTimeChange({start, end})
-    }, [])
-
+        onTimeChange({ start, end });
+    }, []);
 
     return (
         <EuiSuperDatePicker
@@ -44,4 +46,4 @@ export const Datepicker: FC<Props> = ({isLoading = false, onChange = () => {}}) 
             onTimeChange={onTimeChange}
         />
     );
-}
+};

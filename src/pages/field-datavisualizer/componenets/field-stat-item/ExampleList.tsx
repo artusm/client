@@ -1,12 +1,25 @@
-import React, {FC} from "react";
-import {EuiText, EuiListGroup, EuiListGroupItem, EuiButtonEmpty} from "@elastic/eui";
+import React, { FC } from 'react';
+import {
+    EuiText,
+    EuiListGroup,
+    EuiListGroupItem,
+
+} from '@elastic/eui';
 
 interface Props {
-    examples?: string[]
+    examples?: string[];
 }
 
-export const ExpandedRowFieldHeader = ({ children }: { children: React.ReactNode }) => (
-    <EuiText size="xs" color={'subdued'} className={'mlFieldDataCard__valuesTitle'}>
+export const ExpandedRowFieldHeader = ({
+                                           children,
+                                       }: {
+    children: React.ReactNode;
+}) => (
+    <EuiText
+        size="xs"
+        color={'subdued'}
+        className={'mlFieldDataCard__valuesTitle'}
+    >
         {children}
     </EuiText>
 );
@@ -17,9 +30,7 @@ export const ExampleList: FC<Props> = ({ examples }) => {
     }
     let examplesContent;
     if (examples.length === 0) {
-        examplesContent = (
-            <span>Примеров нет</span>
-        );
+        examplesContent = <span>Примеров нет</span>;
     } else {
         examplesContent = examples.map((example, i) => {
             return (
@@ -34,14 +45,18 @@ export const ExampleList: FC<Props> = ({ examples }) => {
     }
 
     return (
-        <div data-test-subj="mlFieldDataExamplesList">
+        <div>
             <ExpandedRowFieldHeader>
                 <span>Примеры:</span>
             </ExpandedRowFieldHeader>
-            <EuiListGroup showToolTips={true} maxWidth={'s'} gutterSize={'none'} flush={true}>
+            <EuiListGroup
+                showToolTips={true}
+                maxWidth={'s'}
+                gutterSize={'none'}
+                flush={true}
+            >
                 {examplesContent}
             </EuiListGroup>
         </div>
     );
 };
-

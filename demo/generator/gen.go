@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	baseURL := "http://es:9200/"
 
 	ts := time.Now().UTC()
@@ -155,7 +157,7 @@ func liveFill(url string) {
 }
 
 func newDurations() (nextCheck time.Duration, duration time.Duration) {
-	duration = time.Millisecond * time.Duration(100*(1+rand.Int()%50))
+	duration = time.Millisecond * time.Duration(50*(rand.Int()%50))
 	nextCheck = time.Second * time.Duration(rand.Int()%120)
 	log.Printf("Задержка: %s След. проверка: %s", duration, nextCheck)
 	return
@@ -242,7 +244,32 @@ type P struct {
 	Type    string    `json:"type"`
 }
 
-var esls = [25]int{
+type PW struct {
+	Timestamp         string `json:"@timestamp"`
+	Esl               int     `json:"esl"`
+	Level   string `json:"level"`
+	LogType string `json:"log_type"`
+	Machine Machine `json:"machine"`
+	Message string    `json:"message"`
+	Offset  int       `json:"offset"`
+	ReadAt  string `json:"read_at"`
+	Source  string    `json:"source"`
+}
+
+type PWD struct {
+	Timestamp         string `json:"@timestamp"`
+	Esl               int     `json:"esl"`
+	Level   string `json:"level"`
+	LogType string `json:"log_type"`
+	Machine Machine `json:"machine"`
+	Message string    `json:"message"`
+	Offset  int       `json:"offset"`
+	ReadAt  string `json:"read_at"`
+	Source  string    `json:"source"`
+	AnomalyCategory string `json:"anomaly_category"`
+}
+
+var esls = [19]int{
 	2000004716011,
 	2000004716000,
 	2000004716012,
@@ -262,12 +289,12 @@ var esls = [25]int{
 	2000004876845,
 	2000004675675,
 	2000004534534,
-	2000004676576,
-	2000004756755,
-	2000004756756,
-	2000004654645,
-	2000004978977,
-	2000004834532,
+	//2000004676576,
+	//2000004756755,
+	//2000004756756,
+	//2000004654645,
+	//2000004978977,
+	//2000004834532,
 }
 
 func getRandomEsl() int  {
@@ -286,6 +313,18 @@ func getTemp(esl int, when time.Time) int {
 	}
 
     return temp[key]
+}
+
+var (
+	singleQuoteRegex *regexp.Regexp
+)
+
+func init()  {
+	singleQuoteRegex, _ = regexp.Compile(`"`)
+}
+
+func ReplaceSingleQuotes(json string) string  {
+	return singleQuoteRegex.ReplaceAllString(json, `'`)
 }
 
 func genEslDatabase(when time.Time) (*bytes.Buffer, error) {
@@ -314,7 +353,7 @@ func genEslDatabase(when time.Time) (*bytes.Buffer, error) {
 		DrawCount: randomNumber(0, 200),
 		BattLast:     randomNumber(2900, 3150),
 		BattMin:      getTemp(esl, when),
-		Temp:         randomNumber(17, 29),
+		Temp:         randomNumber(21, 24),
 		Rssi:         69,
 		Uptime:       randomNumber(30000, 500000),
 		TotalTime:    randomNumber(50000, 300000),
@@ -332,13 +371,13 @@ func genEslDatabase(when time.Time) (*bytes.Buffer, error) {
 		return nil, e
 	}
 
-    message := fmt.Sprintf("Database ESL %d Status %s", esl, b)
+    message := fmt.Sprintf("Database ESL %d Status {'Esl': {'%d': %s }}", esl, esl, ReplaceSingleQuotes(string(b)))
 
 	payload := P{
 		Timestamp: when.UTC().Format("2006-01-02T15:04:05-0700"),
 		Esl: esl,
 		LogType: "ray",
-		Machine: Machine{Hostname: ""},
+		Machine: Machine{Hostname: "DESKTOP-IBVTCQR"},
 		Level: "DEBUG",
 		ReadAt: when.UTC().Format("2006-01-02T15:04:05-0700"),
 		Source: "/home/arthur/2.log",
@@ -355,8 +394,122 @@ func genEslDatabase(when time.Time) (*bytes.Buffer, error) {
 	return buf, err
 }
 
-func genPayload(when time.Time) (*bytes.Buffer, error) {
+func genAnomalyLog(when time.Time) (*bytes.Buffer, error) {
+	esl := getRandomEsl()
 
+	message := fmt.Sprintf("Database ESL %d Status {}", esl)
+
+	payload := PWD{
+		Timestamp: when.UTC().Format("2006-01-02T15:04:05-0700"),
+		Esl: esl,
+		LogType: "ray",
+		Machine: Machine{Hostname: "DESKTOP-IBVTCQR"},
+		Level: "DEBUG",
+		ReadAt: when.UTC().Format("2006-01-02T15:04:05-0700"),
+		Source: "/home/arthur/2.log",
+		Offset: randomNumber(1, 3000000),
+		Message: message,
+		AnomalyCategory: "emptyStatus",
+	}
+
+	log.Printf("%+v", payload)
+
+	buf := &bytes.Buffer{}
+	err := json.NewEncoder(buf).Encode(&payload)
+	return buf, err
+}
+
+var levels = []string{
+"INFO",
+"ERROR",
+"WARNING",
+"DEBUG",
+}
+
+var accessMessages = []string{
+	"star.api.external.v1.endpoints.picture:send_picture:25 - Get picture for send to %d",
+	"star.services.picture:send_to_esl:107 - Picture for %d was not sent to cluster, cluster is not unknown",
+	"star.services.shared:cluster_management_loop:20 - Check esls",
+	"star.api.external.v1.endpoints.picture:send_picture:25 - Get picture for send to %d",
+}
+
+func genRandomAccessMessage(esl int) string {
+	return fmt.Sprintf(accessMessages[rand.Int() % len(accessMessages)], esl)
+}
+
+var driverMessages = []string{
+	"STATUS: from esl: %d, 720 (rssi: 64)",
+	"HTTP: get list of cases",
+	"INIT: send settings to ESL: %d, 1201",
+}
+
+func genRandomDriverMessage(esl int) string {
+	return fmt.Sprintf(driverMessages[rand.Int() % len(driverMessages)], esl)
+}
+
+func genRandomDriverLog(when time.Time)  (*bytes.Buffer, error)  {
+	level := levels[rand.Int() % len(levels)]
+	esl := getRandomEsl()
+	message := genRandomDriverMessage(esl)
+
+	payload := PW{
+		Timestamp: when.UTC().Format("2006-01-02T15:04:05-0700"),
+		Esl: esl,
+		LogType: "driver",
+		Machine: Machine{Hostname: "DESKTOP-IBVTCQR"},
+		Level: level,
+		ReadAt: when.UTC().Format("2006-01-02T15:04:05-0700"),
+		Source: "/home/arthur/2.log",
+		Offset: randomNumber(1, 3000000),
+		Message: message,
+	}
+
+	log.Printf("%+v", payload)
+
+	buf := &bytes.Buffer{}
+	err := json.NewEncoder(buf).Encode(&payload)
+	return buf, err
+}
+
+func genAccessLog(when time.Time)  (*bytes.Buffer, error) {
+	level := levels[rand.Int() % len(levels)]
+	esl := getRandomEsl()
+	message := genRandomAccessMessage(esl)
+	
+	payload := PW{
+		Timestamp: when.UTC().Format("2006-01-02T15:04:05-0700"),
+		Esl: esl,
+		LogType: "access",
+		Machine: Machine{Hostname: "DESKTOP-IBVTCQR"},
+		Level: level,
+		ReadAt: when.UTC().Format("2006-01-02T15:04:05-0700"),
+		Source: "/home/arthur/2.log",
+		Offset: randomNumber(1, 3000000),
+		Message: message,
+	}
+
+	log.Printf("%+v", payload)
+
+	buf := &bytes.Buffer{}
+	err := json.NewEncoder(buf).Encode(&payload)
+	return buf, err
+}
+
+func genPayload(when time.Time) (*bytes.Buffer, error) {
+	switch randomNumber(0, 10) {
+	case 0:
+		return genEslDatabase(when)
+	case 1:
+		return genAccessLog(when)
+	case 2:
+		return genRandomDriverLog(when)
+	case 3:
+		return genAnomalyLog(when)
+	case 4:
+		return genEslDatabase(when)
+	case 5:
+		return genEslDatabase(when)
+	}
 	return genEslDatabase(when)
 }
 

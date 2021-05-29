@@ -10,12 +10,12 @@ import {
     EuiPanel,
     EuiSpacer,
     EuiText,
-} from "@elastic/eui";
-import type { ChangeEvent, FormEvent, MouseEvent } from "react";
-import React, { Component, Fragment } from "react";
+} from '@elastic/eui';
+import type { ChangeEvent, FormEvent, MouseEvent } from 'react';
+import React, { Component, Fragment } from 'react';
 
-import { LoginValidator } from "../helpers/login_validator";
-import { delay } from "../../../utils/delay";
+import { LoginValidator } from '../helpers/login_validator';
+import { delay } from '../../../utils/delay';
 
 interface Props {
     onSuccessAuth?: () => void;
@@ -59,8 +59,8 @@ export class LoginForm extends Component<Props, State> {
 
         this.state = {
             loadingState: { type: LoadingStateType.None },
-            username: "",
-            password: "",
+            username: '',
+            password: '',
             message: { type: MessageType.None },
             mode,
             previousMode: mode,
@@ -85,7 +85,6 @@ export class LoginForm extends Component<Props, State> {
                     <EuiCallOut
                         size="s"
                         color="danger"
-                        data-test-subj="loginErrorMessage"
                         title={message.content}
                         role="alert"
                     />
@@ -100,7 +99,6 @@ export class LoginForm extends Component<Props, State> {
                     <EuiCallOut
                         size="s"
                         color="primary"
-                        data-test-subj="loginInfoMessage"
                         title={message.content}
                         role="status"
                     />
@@ -123,7 +121,7 @@ export class LoginForm extends Component<Props, State> {
 
     private renderLoginForm = () => {
         return (
-            <EuiPanel data-test-subj="loginForm">
+            <EuiPanel>
                 <form onSubmit={this.submitLoginForm}>
                     <EuiFormRow
                         label="Логин"
@@ -150,8 +148,7 @@ export class LoginForm extends Component<Props, State> {
                             autoComplete="off"
                             id="password"
                             name="password"
-                            data-test-subj="loginPassword"
-                            type={"dual"}
+                            type={'dual'}
                             value={this.state.password}
                             onChange={this.onPasswordChange}
                             disabled={!this.isLoadingState(LoadingStateType.None)}
@@ -176,7 +173,6 @@ export class LoginForm extends Component<Props, State> {
                                 onClick={this.submitLoginForm}
                                 isDisabled={!this.isLoadingState(LoadingStateType.None)}
                                 isLoading={this.isLoadingState(LoadingStateType.Form)}
-                                data-test-subj="loginSubmit"
                             >
                                 Войти
                             </EuiButton>
@@ -189,9 +185,9 @@ export class LoginForm extends Component<Props, State> {
 
     private renderLoginHelp = () => {
         return (
-            <EuiPanel data-test-subj="loginHelp">
-                <EuiText>Логин для входа admin</EuiText>
-                <EuiText>Пароль 12345678</EuiText>
+            <EuiPanel>
+                <EuiText>Логин для входа tester</EuiText>
+                <EuiText>Пароль test</EuiText>
             </EuiPanel>
         );
     };
@@ -203,7 +199,6 @@ export class LoginForm extends Component<Props, State> {
                     <EuiSpacer />
                     <EuiText size="xs" className="eui-textCenter">
                         <EuiLink
-                            data-test-subj="loginBackToLoginLink"
                             onClick={() => this.onPageModeChange(this.state.previousMode)}
                         >
                             Назад к логину
@@ -217,10 +212,7 @@ export class LoginForm extends Component<Props, State> {
             <Fragment>
                 <EuiSpacer />
                 <EuiText size="xs" className="eui-textCenter">
-                    <EuiLink
-                        data-test-subj="loginHelpLink"
-                        onClick={() => this.onPageModeChange(PageMode.LoginHelp)}
-                    >
+                    <EuiLink onClick={() => this.onPageModeChange(PageMode.LoginHelp)}>
                         Помощь
                     </EuiLink>
                 </EuiText>
@@ -274,41 +266,39 @@ export class LoginForm extends Component<Props, State> {
         await delay();
 
         try {
-
-
-            const d = await fetch("/api/login", {
-                method: "POST",
+            const d = await fetch('/api/login', {
+                method: 'POST',
                 headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     username,
-                    password
+                    password,
                 }),
             });
 
             const json = await d.json();
 
-
             if (json && json?.success) {
                 if (this.props.onSuccessAuth) {
                     this.setState({
                         loadingState: { type: LoadingStateType.None },
-                        message: { type: MessageType.Info, content: "Вы успешно вошли" },
+                        message: { type: MessageType.Info, content: 'Вы успешно вошли' },
                     });
                     this.props.onSuccessAuth();
                 }
             } else {
                 this.setState({
-                    message: { type: MessageType.Danger, content: "Некорректный логин или пароль" },
+                    message: {
+                        type: MessageType.Danger,
+                        content: 'Некорректный логин или пароль',
+                    },
                     loadingState: { type: LoadingStateType.None },
                 });
             }
-
-
         } catch (error) {
-            const message = "Ошибка! Что-то пошло не так";
+            const message = 'Ошибка! Что-то пошло не так';
 
             this.setState({
                 message: { type: MessageType.Danger, content: message },

@@ -20,7 +20,11 @@ export default function Link({ to, ...rest }) {
             return;
         }
 
-        if (isModifiedEvent(event) || !isLeftClickEvent(event) || isTargetBlank(event)) {
+        if (
+            isModifiedEvent(event) ||
+            !isLeftClickEvent(event) ||
+            isTargetBlank(event)
+        ) {
             return;
         }
 

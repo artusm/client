@@ -3,8 +3,10 @@ RUN mkdir /lq
 WORKDIR /lq
 
 ADD package.json /lq/
+ADD package-lock.json /lq/
 ADD yarn.lock /lq/
-RUN npm install
+ADD tsconfig.json /lq/
+RUN yarn install
 
 ADD public/ /lq/public
 ADD src/ /lq/src/

@@ -16,7 +16,8 @@ export function buildSamplerAggregation(
     };
 }
 
-
-export function getSamplerAggregationsResponsePath(samplerShardSize: number): string[] {
+export function getSamplerAggregationsResponsePath(
+    samplerShardSize: number
+): string[] {
     return samplerShardSize > 0 ? ['sample'] : [];
 }

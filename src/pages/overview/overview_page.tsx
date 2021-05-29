@@ -14,7 +14,11 @@ import {
 } from '@elastic/eui';
 import { humanNumber } from '../../utils/human-number';
 import moment from 'moment';
-import { loadErrorCount, loadLogTypeCounts } from '../../query/overview';
+import {
+    loadAnomalyLogsCount,
+    loadErrorCount,
+    loadLogTypeCounts,
+} from '../../query/overview';
 
 interface Counters {
     total: number;
@@ -22,6 +26,7 @@ interface Counters {
     access: number;
     driver: number;
     error: number;
+    anomaly: number;
 }
 
 const initialCounterState: Counters = {
@@ -30,6 +35,7 @@ const initialCounterState: Counters = {
     ray: 0,
     driver: 0,
     error: 0,
+    anomaly: 0,
 };
 
 const useCounterData = () => {
@@ -39,13 +45,17 @@ const useCounterData = () => {
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
-            const data = await loadLogTypeCounts();
-            const errorCount = await loadErrorCount();
+            const [data, errorCount, anomalyCount] = await Promise.all([
+                loadLogTypeCounts(),
+                loadErrorCount(),
+                loadAnomalyLogsCount(),
+            ]);
 
             setCounters({
                 ...counters,
                 ...data,
                 error: errorCount,
+                anomaly: anomalyCount,
             });
 
             setIsLoading(false);
@@ -158,6 +168,18 @@ const OverviewPage = () => {
                                         <EuiStat
                                             title={humanNumber(counters.driver)}
                                             description="Логи с типом driver"
+                                            textAlign="right"
+                                            isLoading={isLoading}
+                                        >
+                                            <EuiIcon type="empty" />
+                                        </EuiStat>
+                                    </EuiPanel>
+                                </EuiFlexItem>
+                                <EuiFlexItem>
+                                    <EuiPanel>
+                                        <EuiStat
+                                            title={humanNumber(counters.anomaly)}
+                                            description="Логи с аномалиями"
                                             textAlign="right"
                                             isLoading={isLoading}
                                         >

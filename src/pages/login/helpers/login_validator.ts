@@ -28,7 +28,7 @@ export class LoginValidator {
         }
 
         if (!username) {
-            return invalid("Требуется логин");
+            return invalid('Требуется логин');
         }
 
         return valid();
@@ -40,7 +40,7 @@ export class LoginValidator {
         }
 
         if (!password) {
-            return invalid("Требуется пароль");
+            return invalid('Требуется пароль');
         }
         return valid();
     }

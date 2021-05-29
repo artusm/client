@@ -2,7 +2,9 @@ server {
   listen 8080 default_server;
 
   location / {
+  autoindex on;
     root /lq/;
+    try_files $uri $uri/ /index.html;
   }
 
   {{if and .ESProxy .ESURL}}

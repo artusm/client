@@ -1,1 +1,1 @@
-export {default as OverviewPage} from './overview_page';
+export { default as OverviewPage } from './overview_page';

@@ -1,14 +1,14 @@
-import "./login_page.css";
-import React from "react";
-import { EuiSpacer, EuiTitle, EuiFlexItem, EuiFlexGroup } from "@elastic/eui";
-import { LoginForm } from "./components/login_form";
-import { useHistory } from "react-router-dom";
+import './login_page.css';
+import React from 'react';
+import { EuiSpacer, EuiTitle, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import { LoginForm } from './components/login_form';
+import { useHistory } from 'react-router-dom';
 
 const Page = () => {
     const history = useHistory();
 
     const onSuccessAuth = () => {
-        history.push("/");
+        history.push('/');
     };
 
     return (
@@ -17,11 +17,11 @@ const Page = () => {
                 <div className="loginWelcome__content eui-textCenter">
                     <EuiSpacer size="xxl" />
                     <span className="loginWelcome__logo">
-            <img
-                src="https://retail.tools/img/14303839_324.png"
-                alt="Логотип"
-            />
-          </span>
+						<img
+                            src="https://retail.tools/img/14303839_324.png"
+                            alt="Логотип"
+                        />
+					</span>
                     <EuiTitle size="m" className="loginWelcome__title">
                         <h1>Вход</h1>
                     </EuiTitle>
