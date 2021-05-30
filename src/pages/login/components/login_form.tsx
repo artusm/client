@@ -18,7 +18,7 @@ import { LoginValidator } from '../helpers/login_validator';
 import { delay } from '../../../utils/delay';
 
 interface Props {
-    onSuccessAuth?: () => void;
+    onSuccessAuth?: (user: any) => void;
 }
 
 interface State {
@@ -37,7 +37,7 @@ enum LoadingStateType {
     Form,
 }
 
-enum MessageType {
+export enum MessageType {
     None,
     Info,
     Danger,
@@ -130,6 +130,7 @@ export class LoginForm extends Component<Props, State> {
                         <EuiFieldText
                             autoComplete="off"
                             id="username"
+                            icon="user"
                             name="username"
                             value={this.state.username}
                             onChange={this.onUsernameChange}
@@ -148,7 +149,7 @@ export class LoginForm extends Component<Props, State> {
                             autoComplete="off"
                             id="password"
                             name="password"
-                            type={'dual'}
+                            type="dual"
                             value={this.state.password}
                             onChange={this.onPasswordChange}
                             disabled={!this.isLoadingState(LoadingStateType.None)}
@@ -281,12 +282,12 @@ export class LoginForm extends Component<Props, State> {
             const json = await d.json();
 
             if (json && json?.success) {
+                this.setState({
+                    loadingState: { type: LoadingStateType.None },
+                    message: { type: MessageType.Info, content: 'Вы успешно вошли' },
+                });
                 if (this.props.onSuccessAuth) {
-                    this.setState({
-                        loadingState: { type: LoadingStateType.None },
-                        message: { type: MessageType.Info, content: 'Вы успешно вошли' },
-                    });
-                    this.props.onSuccessAuth();
+                    this.props.onSuccessAuth(json.user);
                 }
             } else {
                 this.setState({

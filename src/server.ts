@@ -7,7 +7,7 @@ export function makeServer({ environment = 'development' } = {}) {
         email: `${username}@example.com`,
         full_name: username,
         password: username,
-        permissions: ['access_field_analyse'],
+        permissions: ['access.anomaly_logs'],
     });
 
     let server = new Server({
@@ -23,11 +23,26 @@ export function makeServer({ environment = 'development' } = {}) {
                         full_name: 'вфывф ывф ы',
                         password: 'test',
                         permissions: [
-                            'edit_users',
-                            'access_anomaly_logs',
-                            'access_field_analyse',
-                            'user_list',
+                            "user.edit", "user.create", "user.view_list", "access.anomaly_logs", "access.field_stats", "access.temp_stat", "access.rate", "user.delete"
                         ],
+                    },
+                    {
+                        enabled: true,
+                        username: 'usmanov',
+                        email: 'usmanov@example.com',
+                        full_name: 'Usmanov Arthur',
+                        password: '12345',
+                        permissions: [
+                            "user.edit", "user.create", "user.view_list", "access.anomaly_logs", "access.field_stats", "access.temp_stat", "access.rate", "user.delete"
+                        ],
+                    },
+                    {
+                        enabled: true,
+                        username: 'tester2',
+                        email: 'test@t.tt',
+                        full_name: 'вфывф ывф ы',
+                        password: '12345678',
+                        permissions: [],
                     },
                     createUser('user1'),
                     createUser('user2'),
@@ -76,8 +91,10 @@ export function makeServer({ environment = 'development' } = {}) {
                 });
             });
 
-            this.post('/users', (schema, request) => {
+            this.post('/users', ({db}, request) => {
                 let user = JSON.parse(request.requestBody);
+
+                db.users.insert(user);
 
                 return {
                     created: true,

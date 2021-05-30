@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, {FC, useMemo, useState} from 'react';
 import {
     EuiAvatar,
+    EuiBreadcrumb,
     EuiFlexGroup,
     EuiFlexItem,
     EuiHeader,
@@ -14,11 +15,13 @@ import {
     EuiPopover,
     EuiSpacer,
     EuiText,
-    EuiBreadcrumb,
 } from '@elastic/eui';
-import { v1 as uuidv1 } from 'uuid';
-import { useHistory } from 'react-router';
+import {v1 as uuidv1} from 'uuid';
+import {useHistory} from 'react-router';
+
 import Link from '../Link';
+import {useAuthContext} from "../../containers/auth";
+import {Permissions} from "../../common/permissions";
 
 function htmlIdGenerator(idPrefix: string = '') {
     const staticUuid = uuidv1();
@@ -30,14 +33,16 @@ function htmlIdGenerator(idPrefix: string = '') {
 }
 
 const Header = ({ breadcrumbs = [] }: { breadcrumbs: EuiBreadcrumb[] }) => {
+    const {currentUser, can} = useAuthContext();
+
     return (
         <EuiHeader>
             <EuiHeaderSection grow={false}>
                 <EuiHeaderSectionItem border="right">
                     <Link to="/" className="euiHeaderLogo">
                         <img
-                            src={'https://retail.tools/img/14303839_324.png'}
-                            alt={'logo'}
+                            src="https://retail.tools/img/14303839_324.png"
+                            alt="logo"
                             style={{ height: 35 }}
                         />
                     </Link>
@@ -48,18 +53,18 @@ const Header = ({ breadcrumbs = [] }: { breadcrumbs: EuiBreadcrumb[] }) => {
 
             <EuiHeaderSection side="right">
                 <EuiHeaderSectionItem>
-                    <HeaderUserMenu />
+                    <HeaderUserMenu username={currentUser?.username ?? ''} />
                 </EuiHeaderSectionItem>
 
                 <EuiHeaderSectionItem>
-                    <HeaderAppMenu />
+                    <HeaderAppMenu can={can} />
                 </EuiHeaderSectionItem>
             </EuiHeaderSection>
         </EuiHeader>
     );
 };
 
-const HeaderUserMenu = () => {
+const HeaderUserMenu = ({ username }) => {
     const id = htmlIdGenerator()();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -78,7 +83,7 @@ const HeaderUserMenu = () => {
             aria-haspopup="true"
             onClick={onMenuButtonClick}
         >
-            <EuiAvatar name="test" size="s" />
+            <EuiAvatar name={username} size="s" />
         </EuiHeaderSectionItemButton>
     );
 
@@ -98,12 +103,12 @@ const HeaderUserMenu = () => {
                     responsive={false}
                 >
                     <EuiFlexItem grow={false}>
-                        <EuiAvatar name="test" size="xl" />
+                        <EuiAvatar name={username} size="xl" />
                     </EuiFlexItem>
 
                     <EuiFlexItem>
                         <EuiText>
-                            <p>tester</p>
+                            <p>{username}</p>
                         </EuiText>
 
                         <EuiSpacer size="m" />
@@ -112,7 +117,7 @@ const HeaderUserMenu = () => {
                             <EuiFlexItem>
                                 <EuiFlexGroup justifyContent="spaceBetween">
                                     <EuiFlexItem grow={false}>
-                                        <Link to="/users/test">Редактировать</Link>
+                                        <Link to={`/users/${username}`}>Редактировать</Link>
                                     </EuiFlexItem>
 
                                     <EuiFlexItem grow={false}>
@@ -128,7 +133,55 @@ const HeaderUserMenu = () => {
     );
 };
 
-const HeaderAppMenu = () => {
+interface HeaderAppMenuProps {
+    can: (permission: string) => boolean
+}
+
+const menuItems = [
+    {
+        label: 'Главаня',
+        url: '/',
+        icon: 'discoverApp'
+    },
+    {
+        label: 'Аналитика полей',
+        url: '/field-stats',
+        icon: 'visBarHorizontalStacked',
+        permission: Permissions.ACCESS_TO_FIELD_STATS,
+    },
+    {
+        label: 'Мониторинг температуры ценников',
+        url: '/temp-stat',
+        icon: 'monitoringApp',
+        permission: Permissions.ACCESS_TO_TEMP_STAT
+    },
+    {
+        label: 'Статистика темпа добавления логов',
+        url: '/stat',
+        icon: 'visualizeApp',
+        permission: Permissions.ACCESS_TO_RATE_STAT
+    },
+    {
+        label: 'Логи с аномалиями',
+        url: '/anomaly-logs',
+        icon: 'sqlApp',
+        permission: Permissions.ACCESS_TO_ANOMALY_LOGS
+    },
+    {
+        label: 'Пользователи',
+        url: '/users',
+        icon: 'users',
+        permission: Permissions.VIEW_USER_LIST
+    },
+    {
+        label: 'Создать нового пользователя',
+        url: '/users/new',
+        icon: 'user',
+        permission: Permissions.CREATE_USER,
+    },
+]
+
+const HeaderAppMenu: FC<HeaderAppMenuProps> = ({can}) => {
     const history = useHistory();
     const idGenerator = htmlIdGenerator();
     const popoverId = idGenerator('popover');
@@ -166,6 +219,17 @@ const HeaderAppMenu = () => {
         history.push(url);
     };
 
+    const items = useMemo(() => {
+        return menuItems.filter(({permission}) => {
+            if (permission) {
+                return can(permission)
+            }
+
+            return true;
+        });
+    }, [can]);
+
+
     return (
         <EuiPopover
             id={popoverId}
@@ -175,65 +239,16 @@ const HeaderAppMenu = () => {
             closePopover={closeMenu}
         >
             <EuiKeyPadMenu id={keypadId} style={{ width: 288 }}>
-                <EuiKeyPadMenuItem
-                    label="Главаня"
-                    data-url="/"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="discoverApp" size="l" />
-                </EuiKeyPadMenuItem>
-                <EuiKeyPadMenuItem
-                    label="Аналитика полей"
-                    data-url="/field-stats"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="visBarHorizontalStacked" size="l" />
-                </EuiKeyPadMenuItem>
-                <EuiKeyPadMenuItem
-                    label="Мониторинг температуры ценников"
-                    data-url="/temp-stat"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="monitoringApp" size="l" />
-                </EuiKeyPadMenuItem>
-
-                <EuiKeyPadMenuItem
-                    label="Статистика темпа добавления логов"
-                    data-url="/stat"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="visualizeApp" size="l" />
-                </EuiKeyPadMenuItem>
-                <EuiKeyPadMenuItem
-                    label="Логи с аномалиями"
-                    data-url="/anomaly-logs"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="sqlApp" size="l" />
-                </EuiKeyPadMenuItem>
-
-                <EuiKeyPadMenuItem
-                    label="Пользователи"
-                    data-url="/users"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="users" size="l" />
-                </EuiKeyPadMenuItem>
-
-                <EuiKeyPadMenuItem
-                    label="Создать нового пользователя"
-                    data-url="/users/new"
-                    // @ts-ignore
-                    onClick={onClick}
-                >
-                    <EuiIcon type="user" size="l" />
-                </EuiKeyPadMenuItem>
+                {items.map(({label, url, icon}) => (
+                    <EuiKeyPadMenuItem
+                        label={label}
+                        data-url={url}
+                        // @ts-ignore
+                        onClick={onClick}
+                    >
+                        <EuiIcon type={icon} size="l" />
+                    </EuiKeyPadMenuItem>
+                ))}
             </EuiKeyPadMenu>
         </EuiPopover>
     );

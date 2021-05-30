@@ -8,9 +8,9 @@ interface Props {
 }
 
 export const EslList: FC<Props> = ({
-                                       onChangeEsl = () => {},
-                                       isGlobalLoading = false,
-                                   }) => {
+    onChangeEsl = () => {},
+    isGlobalLoading = false,
+}) => {
     const [isLoading, setIsloading] = useState(true);
     const [options, setOptions] = useState([]);
 

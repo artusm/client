@@ -30,12 +30,12 @@ export const Datepicker: FC<Props> = ({
         const startMoment = dateMath.parse(start);
 
         if (!startMoment || !startMoment.isValid()) {
-            throw new Error('Unable to parse start string');
+            throw new Error(`Не удалось распарсить начальную дату: ${startMoment}`);
         }
 
         const endMoment = dateMath.parse(end, { roundUp: true });
         if (!endMoment || !endMoment.isValid()) {
-            throw new Error('Unable to parse end string');
+            throw new Error(`Не удалось распарсить дату окончания: ${endMoment}`);
         }
 
         if (onChange) {

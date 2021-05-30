@@ -11,11 +11,11 @@ export const DistinctValues: FC<Props> = ({ distinctCount }) => {
             <>
                 <div>
                     <EuiText size="xs" color="subdued">
-                        <EuiIcon type={'database'} />
+                        <EuiIcon type="database" />
                         {distinctCount} уникальных значений
                     </EuiText>
                 </div>
-                <EuiSpacer size={'m'} />
+                <EuiSpacer size="m" />
             </>
         );
     }

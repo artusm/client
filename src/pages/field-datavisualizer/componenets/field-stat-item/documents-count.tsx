@@ -16,7 +16,7 @@ export const DocumentsCount: FC<Props> = ({ count, totalCount }) => {
                     {count} документов ({getPercentLabel(count, totalCount)})
                 </EuiText>
             </div>
-            <EuiSpacer size={'xs'} />
+            <EuiSpacer size="xs" />
         </>
     );
 };

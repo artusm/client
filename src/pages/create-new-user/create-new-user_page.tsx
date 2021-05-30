@@ -20,6 +20,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useServer } from '../../utils/server';
+import {accessOptions} from '../edit-user/edit-user-page';
 
 const NewUserPage = () => {
     useServer();
@@ -76,25 +77,6 @@ const options = [
                 Диактивен
             </EuiHealth>
         ),
-    },
-];
-
-const accessOptions = [
-    {
-        label: 'Редактировать пользователей',
-        value: 'edit_users',
-    },
-    {
-        label: 'Доступ к анализу аномальных логов',
-        value: 'access_anomaly_logs',
-    },
-    {
-        label: 'Доступ к анализу полей',
-        value: 'access_field_analyse',
-    },
-    {
-        label: 'Доступ к списку пользователей',
-        value: 'user_list',
     },
 ];
 
@@ -164,7 +146,7 @@ const NewUserForm = () => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.username}
-                    icon={'user'}
+                    icon="user"
                     {...register('username', {
                         required: {
                             value: true,
@@ -190,7 +172,7 @@ const NewUserForm = () => {
             <EuiFormRow label="Имя">
                 <EuiFieldText
                     disabled={isLoading}
-                    icon={'user'}
+                    icon="user"
                     {...register('full_name')}
                 />
             </EuiFormRow>
@@ -202,7 +184,7 @@ const NewUserForm = () => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.email}
-                    icon={'email'}
+                    icon="email"
                     {...register('email', {
                         required: {
                             value: true,
@@ -226,7 +208,7 @@ const NewUserForm = () => {
                     autoComplete="off"
                     isInvalid={!!errors.password}
                     id="password"
-                    type={'dual'}
+                    type="dual"
                     aria-required={true}
                     {...register('password', {
                         required: {
@@ -265,7 +247,7 @@ const NewUserForm = () => {
             </EuiFormRow>
             <EuiSpacer />
 
-            <EuiButton type={'submit'} isLoading={isLoading}>
+            <EuiButton type="submit" isLoading={isLoading}>
                 Создать
             </EuiButton>
         </EuiForm>

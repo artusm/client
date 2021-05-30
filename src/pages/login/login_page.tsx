@@ -3,12 +3,19 @@ import React from 'react';
 import { EuiSpacer, EuiTitle, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 import { LoginForm } from './components/login_form';
 import { useHistory } from 'react-router-dom';
+import { useAuthContext } from "../../containers/auth";
+import { useServer } from "../../utils/server";
+import { delay } from "../../utils/delay";
 
 const Page = () => {
+    useServer();
+    const { login } = useAuthContext();
     const history = useHistory();
 
-    const onSuccessAuth = () => {
-        history.push('/');
+    const onSuccessAuth = async (user) => {
+        login(user);
+        await delay(300);
+        history.push('/')
     };
 
     return (

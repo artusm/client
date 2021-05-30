@@ -1,14 +1,36 @@
 import createContainer from 'constate';
-import { useState } from 'react';
+import {createContext, useState} from 'react';
+
+type User = {
+    id?: string;
+    username?: string;
+    permissions?: string[];
+}
 
 export const useAuth = () => {
-    const [currentUser, setCurrentUser] = useState({});
-    const [isLoading, setIsLoaing] = useState(true);
+    const [currentUser, setCurrentUser] = useState<User>({});
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const login = (user) => {
+      setCurrentUser(user);
+      setIsLoggedIn(true);
+    };
+
+    const logout = () => {
+        setCurrentUser({});
+        setIsLoggedIn(false);
+    };
+
+    const can = (permission: string): boolean => {
+        return isLoggedIn && currentUser.permissions!.includes(permission);
+    }
 
     return {
-        isLoading,
+        can,
+        login,
+        logout,
         currentUser,
-        setCurrentUser,
+        isLoggedIn,
     };
 };
 

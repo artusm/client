@@ -17,6 +17,8 @@ import useSWR from 'swr';
 import Link from '../../components/Link';
 import { useHistory } from 'react-router';
 import { useServer } from '../../utils/server';
+import {useAuthContext} from "../../containers/auth";
+import {Permissions} from "../../common/permissions";
 
 const AddNewUserButton = () => {
     const history = useHistory();
@@ -65,73 +67,7 @@ const UserListPage = () => {
     );
 };
 
-const actions = [
-    {
-        name: 'Редактировать',
-        description: 'Редактировать этого пользователя',
-        render: (item) => (
-            <Link to={`/users/${item.username}`}>
-                <EuiIcon type="gear" />
-            </Link>
-        ),
-    },
-];
 
-const columns = [
-    {
-        field: 'username',
-        name: 'Имя пользователя',
-        sortable: true,
-        mobileOptions: {
-            render: (item) => <span>{item.username}</span>,
-            header: false,
-            truncateText: false,
-            enlarge: true,
-            fullWidth: true,
-        },
-        render: (username) => (
-            <span>
-				<EuiAvatar size="s" name={username} /> {username}
-			</span>
-        ),
-    },
-    {
-        field: 'full_name',
-        name: 'Имя',
-        truncateText: true,
-        mobileOptions: {
-            show: false,
-        },
-        sortable: true,
-    },
-    {
-        field: 'email',
-        name: 'Почта',
-    },
-    {
-        field: 'enabled',
-        name: 'Статус',
-        dataType: 'boolean',
-        render: (enabled) => {
-            const color = enabled ? 'success' : 'danger';
-            const label = enabled ? 'Активен' : 'Не активен';
-            return <EuiHealth color={color}>{label}</EuiHealth>;
-        },
-        footer: ({ items, pagination }) => {
-            return (
-                <strong>
-                    Активных: {items.reduce((acc, cur) => acc + cur.enabled, 0)}
-                </strong>
-            );
-        },
-        sortable: true,
-    },
-    {
-        name: 'Дейсвия',
-        field: '__',
-        actions,
-    },
-];
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -141,6 +77,7 @@ const pagination = {
 };
 
 const UserList = () => {
+    const {can, currentUser} = useAuthContext();
     const { data, mutate } = useSWR('/api/users', fetcher, {
         onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
             setTimeout(() => revalidate({ retryCount }), 50);
@@ -154,12 +91,13 @@ const UserList = () => {
             body="Идет загрузка пользователей"
         />
     ));
+    const canEdit = can(Permissions.EDIT_USER);
 
     const items = data ? data : [];
     const isLoading = !data;
 
     const selectionValue = {
-        selectable: (user) => user.username !== 'tester',
+        selectable: (user) => user.username !== currentUser.username && can(Permissions.DELETE_USER),
         selectableMessage: (selectable) =>
             !selectable ? 'Вы не можете выделить этого пользователя' : undefined,
         onSelectionChange: (selection) => setSelection(selection),
@@ -169,7 +107,6 @@ const UserList = () => {
     const deleteUsers = async () => {
         if (window.confirm('Удалить')) {
             const url = `/api/users/${selection.map(({ id }) => id).join()}`;
-            console.log(url);
             await fetch(url, {
                 method: 'DELETE',
                 headers: {
@@ -180,6 +117,74 @@ const UserList = () => {
             mutate();
         }
     };
+
+    const actions = [
+        {
+            name: 'Редактировать',
+            description: 'Редактировать этого пользователя',
+            render: (item) => (
+                canEdit ? <Link to={`/users/${item.username}`}>
+                    <EuiIcon type="gear" />
+                </Link> : <span />
+            ),
+        },
+    ];
+
+    const columns = [
+        {
+            field: 'username',
+            name: 'Имя пользователя',
+            sortable: true,
+            mobileOptions: {
+                render: (item) => <span>{item.username}</span>,
+                header: false,
+                truncateText: false,
+                enlarge: true,
+                fullWidth: true,
+            },
+            render: (username) => (
+                <span>
+				<EuiAvatar size="s" name={username} /> {username}
+			</span>
+            ),
+        },
+        {
+            field: 'full_name',
+            name: 'Имя',
+            truncateText: true,
+            mobileOptions: {
+                show: false,
+            },
+            sortable: true,
+        },
+        {
+            field: 'email',
+            name: 'Почта',
+        },
+        {
+            field: 'enabled',
+            name: 'Статус',
+            dataType: 'boolean',
+            render: (enabled) => {
+                const color = enabled ? 'success' : 'danger';
+                const label = enabled ? 'Активен' : 'Не активен';
+                return <EuiHealth color={color}>{label}</EuiHealth>;
+            },
+            footer: ({ items, pagination }) => {
+                return (
+                    <strong>
+                        Активных: {items.reduce((acc, cur) => acc + cur.enabled, 0)}
+                    </strong>
+                );
+            },
+            sortable: true,
+        },
+        {
+            name: 'Дейсвия',
+            field: '__',
+            actions,
+        },
+    ];
 
     const renderDeleteButton = () => {
         if (selection.length === 0) {
@@ -202,7 +207,7 @@ const UserList = () => {
                 type: 'is',
                 field: 'enabled',
                 name: 'Активные пользователи',
-                negatedName: false,
+                value: true,
             },
         ],
     };

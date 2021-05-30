@@ -94,7 +94,7 @@ const FieldDataVisualizerPage = () => {
                                 />
                             )}
                             {isLoading && <EuiProgress size="xs" color="accent" />}
-                            <EuiSpacer size={'l'} />
+                            <EuiSpacer size="l" />
                             <EuiFlexGroup
                                 alignItems="center"
                                 gutterSize="s"
@@ -188,7 +188,7 @@ const fields: HistogramField[] = [
     buildField('esl_database_status.fw_crc', FIELD_TYPES.NUMBER),
     buildField('event.type', FIELD_TYPES.KEYWORD),
     buildField('event.timestamp', FIELD_TYPES.NUMBER),
-    buildField('event.els', FIELD_TYPES.NUMBER),
+    buildField('event.esl', FIELD_TYPES.NUMBER),
     buildField('event.id', FIELD_TYPES.NUMBER),
     buildField('event.error', FIELD_TYPES.NUMBER),
     buildField('event.dongle', FIELD_TYPES.NUMBER),

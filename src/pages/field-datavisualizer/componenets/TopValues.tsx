@@ -50,7 +50,7 @@ export const TopValues: FC<Props> = ({ topValues, count, barColor }) => {
                 Наиболее встречающиеся значения
             </ExpandedRowFieldHeader>
 
-            <div className={'mlFieldDataTopValuesContainer'}>
+            <div className="mlFieldDataTopValuesContainer">
                 {Array.isArray(topValues) &&
                 topValues.map((value) => (
                     <EuiFlexGroup gutterSize="xs" alignItems="center" key={value.key}>
@@ -63,18 +63,20 @@ export const TopValues: FC<Props> = ({ topValues, count, barColor }) => {
                             )}
                         >
                             <EuiToolTip content={value.key} position="right">
-                                <EuiText size="xs" textAlign={'right'} color="subdued">
+                                <EuiText size="xs" textAlign="right" color="subdued">
                                     {value.key}
                                 </EuiText>
                             </EuiToolTip>
                         </EuiFlexItem>
                         <EuiFlexItem>
-                            <EuiProgress
-                                value={value.doc_count}
-                                max={progressBarMax}
-                                color={barColor}
-                                size="m"
-                            />
+                            <EuiToolTip content={value.doc_count} position="top">
+                                <EuiProgress
+                                    value={value.doc_count}
+                                    max={progressBarMax}
+                                    color={barColor}
+                                    size="m"
+                                />
+                            </EuiToolTip>
                         </EuiFlexItem>
                         {progressBarMax !== undefined && (
                             <EuiFlexItem

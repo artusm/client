@@ -41,8 +41,8 @@ export const FieldStatItem: FC<FieldStatItemProps> = ({
         <EuiFlexItem style={{ minWidth: 360 }}>
             <EuiPanel className="mlFieldDataCard">
                 <FieldHeader type={type} fieldName={fieldName} />
-                <div className={'mlFieldDataCard__content'}>
-                    <div className={'mlFieldDataCard__stats'}>
+                <div className="mlFieldDataCard__content">
+                    <div className="mlFieldDataCard__stats">
                         {getBody(type, totalCount, data, fieldName)}
                     </div>
                 </div>

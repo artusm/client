@@ -1,24 +1,25 @@
-import React, { useState, useMemo, FC } from 'react';
+import React, {FC, useMemo, useState} from 'react';
 import Header from '../../components/root/Header';
-import useSWR, { mutate } from 'swr';
+import useSWR, {mutate} from 'swr';
 import {
+    EuiButton,
+    EuiComboBox,
+    EuiFieldText,
+    EuiForm,
+    EuiFormRow,
+    EuiHealth,
     EuiPage,
+    EuiPageBody,
     EuiPageContent,
     EuiPageContentBody,
     EuiPageHeader,
-    EuiPageBody,
-    EuiFormRow,
     EuiSpacer,
-    EuiForm,
-    EuiButton,
-    EuiHealth,
     EuiSuperSelect,
-    EuiFieldText,
-    EuiComboBox,
 } from '@elastic/eui';
-import { useForm } from 'react-hook-form';
-import { useHistory, useParams } from 'react-router';
-import { useServer } from '../../utils/server';
+import {useForm} from 'react-hook-form';
+import {useHistory, useParams} from 'react-router';
+import {useServer} from '../../utils/server';
+import {Permissions} from "../../common/permissions";
 
 const OverviewPage = () => {
     useServer();
@@ -81,22 +82,38 @@ const options = [
     },
 ];
 
-const accessOptions = [
+export const accessOptions = [
     {
-        label: 'Редактировать пользователей',
-        value: 'edit_users',
+        label: 'Доступ редактировать пользователей',
+        value: Permissions.EDIT_USER,
     },
     {
-        label: 'Доступ к анализу аномальных логов',
-        value: 'access_anomaly_logs',
-    },
-    {
-        label: 'Доступ к анализу полей',
-        value: 'access_field_analyse',
+        label: 'Доступ к созданию новых пользователей',
+        value: Permissions.CREATE_USER,
     },
     {
         label: 'Доступ к списку пользователей',
-        value: 'user_list',
+        value: Permissions.VIEW_USER_LIST,
+    },
+    {
+        label: 'Доступ к удалению пользователей',
+        value: Permissions.DELETE_USER,
+    },
+    {
+        label: 'Доступ к просмотру аномальных логов',
+        value: Permissions.ACCESS_TO_ANOMALY_LOGS,
+    },
+    {
+        label: 'Доступ к аналитике полей',
+        value: Permissions.ACCESS_TO_FIELD_STATS,
+    },
+    {
+        label: 'Доступ к мониторингу температуры ценников',
+        value: Permissions.ACCESS_TO_TEMP_STAT,
+    },
+    {
+        label: 'Доступ к статистике темпа добавления логов',
+        value: Permissions.ACCESS_TO_RATE_STAT,
     },
 ];
 interface User {
@@ -119,8 +136,10 @@ const EditUserForm: FC<Props> = ({ user }) => {
     const [accesses, setAccesses] = useState<any>(() => {
         if (user?.permissions) {
             return user.permissions.map((p) =>
-                accessOptions.find((a) => p === a.value)
-            );
+                accessOptions.find((a) => {
+                    return p === a.value
+                })
+            ).filter(Boolean);
         }
 
         return [];
@@ -150,7 +169,7 @@ const EditUserForm: FC<Props> = ({ user }) => {
 
         setIsLoading(false);
         const json: any = await data.json();
-        console.log(json);
+
         if (json.updated) {
             mutate('/api/users');
             mutate(`/api/users/${user!.id}`);
@@ -190,7 +209,7 @@ const EditUserForm: FC<Props> = ({ user }) => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.username}
-                    icon={'user'}
+                    icon="user"
                     defaultValue={user?.username}
                     {...register('username', {
                         required: {
@@ -217,7 +236,7 @@ const EditUserForm: FC<Props> = ({ user }) => {
             <EuiFormRow label="Имя">
                 <EuiFieldText
                     disabled={isLoading}
-                    icon={'user'}
+                    icon="user"
                     defaultValue={user?.full_name}
                     {...register('full_name')}
                 />
@@ -231,7 +250,7 @@ const EditUserForm: FC<Props> = ({ user }) => {
                 <EuiFieldText
                     disabled={isLoading}
                     isInvalid={!!errors.email}
-                    icon={'email'}
+                    icon="email"
                     defaultValue={user?.email}
                     {...register('email', {
                         required: {
@@ -271,7 +290,7 @@ const EditUserForm: FC<Props> = ({ user }) => {
             </EuiFormRow>
             <EuiSpacer />
 
-            <EuiButton type={'submit'} isLoading={isLoading}>
+            <EuiButton type="submit" isLoading={isLoading}>
                 Обновить
             </EuiButton>
         </EuiForm>

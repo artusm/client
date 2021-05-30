@@ -11,14 +11,14 @@ interface Props {
 }
 
 export const ExpandedRowFieldHeader = ({
-                                           children,
-                                       }: {
+    children,
+}: {
     children: React.ReactNode;
 }) => (
     <EuiText
         size="xs"
-        color={'subdued'}
-        className={'mlFieldDataCard__valuesTitle'}
+        color="subdued"
+        className="mlFieldDataCard__valuesTitle"
     >
         {children}
     </EuiText>
@@ -51,8 +51,8 @@ export const ExampleList: FC<Props> = ({ examples }) => {
             </ExpandedRowFieldHeader>
             <EuiListGroup
                 showToolTips={true}
-                maxWidth={'s'}
-                gutterSize={'none'}
+                maxWidth="s"
+                gutterSize="none"
                 flush={true}
             >
                 {examplesContent}

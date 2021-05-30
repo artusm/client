@@ -8,7 +8,7 @@ import {
     EuiCallOut,
 } from '@elastic/eui';
 import { EslList } from './components/esl-list';
-import { Datepicker } from './components/datepicker';
+import { Datepicker } from '../../components/datepicker';
 import React, { useEffect, useState } from 'react';
 import client from 'redaxios';
 import { get } from 'get-wild';
