@@ -42,7 +42,7 @@ export function makeServer({ environment = 'development' } = {}) {
                         email: 'test@t.tt',
                         full_name: 'вфывф ывф ы',
                         password: '12345678',
-                        permissions: [],
+                        permissions: ["access.temp_stat", "user.view_list", "user.edit", "user.create", "user.delete"],
                     },
                     createUser('user1'),
                     createUser('user2'),

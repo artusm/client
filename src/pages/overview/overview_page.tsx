@@ -87,7 +87,7 @@ const OverviewPage = () => {
                     <EuiPageHeader
                         iconType="discoverApp"
                         pageTitle="Главная"
-                        description={`Сегодня ${moment().format('MM.DD.YYYY HH:mm ')}`}
+                        description={`Статистика загружена ${moment().calendar()}`}
                     />
 
                     <EuiPageContent
