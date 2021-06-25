@@ -7,7 +7,7 @@ export function makeServer({ environment = 'development' } = {}) {
         email: `${username}@example.com`,
         full_name: username,
         password: username,
-        permissions: ['access.anomaly_logs'],
+        permissions: [],
     });
 
     let server = new Server({
@@ -23,7 +23,7 @@ export function makeServer({ environment = 'development' } = {}) {
                         full_name: 'вфывф ывф ы',
                         password: 'test',
                         permissions: [
-                            "user.edit", "user.create", "user.view_list", "access.anomaly_logs", "access.field_stats", "access.temp_stat", "access.rate", "user.delete"
+                            "user.edit", "user.create", "user.view_list", "access.field_stats", "access.temp_stat", "access.rate", "user.delete"
                         ],
                     },
                     {
@@ -33,7 +33,7 @@ export function makeServer({ environment = 'development' } = {}) {
                         full_name: 'Usmanov Arthur',
                         password: '12345',
                         permissions: [
-                            "user.edit", "user.create", "user.view_list", "access.anomaly_logs", "access.field_stats", "access.temp_stat", "access.rate", "user.delete"
+                            "user.edit", "user.create", "user.view_list", "access.field_stats", "access.temp_stat", "access.rate", "user.delete"
                         ],
                     },
                     {

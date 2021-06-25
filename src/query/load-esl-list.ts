@@ -8,7 +8,7 @@ interface EslList {
     docCount: number;
 }
 
-export const loadEslList = async (): Promise<EslList[]> => {
+export const loadEslList = async (addition: any = {}): Promise<EslList[]> => {
     try {
         const { data } = await client.post('http://localhost:9200/li-*/_search', {
             size: 0,
@@ -28,6 +28,7 @@ export const loadEslList = async (): Promise<EslList[]> => {
                     },
                 },
             },
+            ...addition
         });
 
         const buckets = get(data, 'aggregations.esls.buckets');

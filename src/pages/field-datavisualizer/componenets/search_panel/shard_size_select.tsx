@@ -15,7 +15,7 @@ const searchSizeOptions = [1000, 5000, 10000, 100000, -1].map((v) => {
         value: String(v),
         inputDisplay:
             v > 0 ? (
-                <span>Размер выборки (на сегмент): {v}</span>
+                <span>Размер выборки (на сегмент (shard)): {v}</span>
             ) : (
                 <span>Искать везде</span>
             ),

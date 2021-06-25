@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, {FC, useEffect, useMemo, useState} from 'react';
 import Header from '../../components/root/Header';
 import {
     EuiPage,
@@ -13,7 +13,8 @@ import {
     EuiSpacer,
     EuiText,
     EuiLoadingContent,
-    EuiProgress,
+    EuiProgress, EuiFormRow,
+    EuiSwitch,
 } from '@elastic/eui';
 import { FieldStatItem } from './componenets/field-stat-item/field-stat-item';
 import { FIELD_TYPES } from '../../common/field_types';
@@ -22,6 +23,10 @@ import { QueryContainer } from '@elastic/eui/src/components/search_bar/query/ast
 import SearchBar from '../../components/search-bar';
 import { Datepicker } from '../../components/datepicker';
 import { ShardSizeFilter } from './componenets/search_panel/shard_size_select';
+
+const isEmpty = (data: any) => {
+    return !(data.count > 0 || data.earliest || (data.topValues && data.topValues.length));
+}
 
 const FieldDataVisualizerPage = () => {
     const {
@@ -33,6 +38,21 @@ const FieldDataVisualizerPage = () => {
         setSamplerShardSize,
         samplerShardSize,
     } = useData();
+    const [isSwitchChecked, setIsSwitchChecked] = useState(false);
+    const onSwitchChange = () => {
+        setIsSwitchChecked(!isSwitchChecked);
+    };
+
+    const dataToDisplay = useMemo(() => {
+        let nonEmptyFields = data.fields.filter((f) => !isEmpty(f))
+
+        return {
+            fields: isSwitchChecked ? data.fields : nonEmptyFields,
+            nonEmptyFields: nonEmptyFields.length,
+            totalFieldsCount: data.fields.length,
+            totalCount: data.totalCount
+        }
+    }, [isSwitchChecked, data])
 
     return (
         <>
@@ -95,13 +115,21 @@ const FieldDataVisualizerPage = () => {
                             )}
                             {isLoading && <EuiProgress size="xs" color="accent" />}
                             <EuiSpacer size="l" />
+                            <EuiSwitch
+                                name="switch"
+                                label="Пустые поля"
+                                checked={isSwitchChecked}
+                                onChange={onSwitchChange}
+                            />
+                            {dataToDisplay?.nonEmptyFields || 0} / {dataToDisplay?.totalFieldsCount || 0}
+                            <EuiSpacer size="l" />
                             <EuiFlexGroup
                                 alignItems="center"
                                 gutterSize="s"
                                 direction="row"
                                 wrap={true}
                             >
-                                <List isLoading={isLoading} data={data} />
+                                <List isLoading={isLoading} data={dataToDisplay} />
                             </EuiFlexGroup>
                         </EuiPageContentBody>
                     </EuiPageContent>
@@ -261,12 +289,14 @@ interface ListProps {
 }
 
 const List: FC<ListProps> = ({ isLoading = false, data }) => {
+
     if (isLoading) return <div>Загурзка</div>;
 
     const { totalCount, fields } = data;
 
     return (
         <>
+
             {fields.map((f) => (
                 <FieldStatItem
                     key={f.fieldName}

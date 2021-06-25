@@ -201,6 +201,7 @@ const UserList = () => {
         toolsLeft: renderDeleteButton(),
         box: {
             incremental: true,
+            placeholder: 'Поиск...',
         },
         filters: [
             {

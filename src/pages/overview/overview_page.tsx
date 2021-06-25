@@ -175,18 +175,18 @@ const OverviewPage = () => {
                                         </EuiStat>
                                     </EuiPanel>
                                 </EuiFlexItem>
-                                <EuiFlexItem>
-                                    <EuiPanel>
-                                        <EuiStat
-                                            title={humanNumber(counters.anomaly)}
-                                            description="Логи с аномалиями"
-                                            textAlign="right"
-                                            isLoading={isLoading}
-                                        >
-                                            <EuiIcon type="empty" />
-                                        </EuiStat>
-                                    </EuiPanel>
-                                </EuiFlexItem>
+                                {/*<EuiFlexItem>*/}
+                                {/*    <EuiPanel>*/}
+                                {/*        <EuiStat*/}
+                                {/*            title={humanNumber(counters.anomaly)}*/}
+                                {/*            description="Логи с аномалиями"*/}
+                                {/*            textAlign="right"*/}
+                                {/*            isLoading={isLoading}*/}
+                                {/*        >*/}
+                                {/*            <EuiIcon type="empty" />*/}
+                                {/*        </EuiStat>*/}
+                                {/*    </EuiPanel>*/}
+                                {/*</EuiFlexItem>*/}
                             </EuiFlexGroup>
                         </EuiPageContentBody>
                     </EuiPageContent>

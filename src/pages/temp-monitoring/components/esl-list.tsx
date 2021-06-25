@@ -16,7 +16,13 @@ export const EslList: FC<Props> = ({
 
     useEffect(() => {
         const load = async () => {
-            const esls = await loadEslList();
+            const esls = await loadEslList({
+                "query": {
+                    "exists": {
+                        "field": "esl_database_status.temp"
+                    }
+                }
+            });
 
             const options = esls.map((b) => ({
                 label: `${b.esl}`,
@@ -45,6 +51,7 @@ export const EslList: FC<Props> = ({
             searchable
             isLoading={isLoading || isGlobalLoading}
             options={options}
+            height="full"
             loadingMessage={
                 isGlobalLoading ? 'Загружаются данные' : 'Идет загрузка esl'
             }

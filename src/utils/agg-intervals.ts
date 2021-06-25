@@ -53,15 +53,15 @@ export const getNonTextFieldStats = async (
             };
         }
 
-        if (field.type === FIELD_TYPES.NUMBER) {
-            aggs[`${id}_percentiles`] = {
-                percentiles: {
-                    field: field.fieldName,
-                    percents,
-                    keyed: false,
-                },
-            };
-        }
+        // if (field.type === FIELD_TYPES.NUMBER) {
+        //     aggs[`${id}_percentiles`] = {
+        //         percentiles: {
+        //             field: field.fieldName,
+        //             percents,
+        //             keyed: false,
+        //         },
+        //     };
+        // }
 
         if (field.type === FIELD_TYPES.KEYWORD) {
             aggs[`${id}_count`] = {
@@ -177,26 +177,26 @@ export const getNonTextFieldStats = async (
             stats.cardinality = cardinality;
         }
 
-        if (field.type === FIELD_TYPES.NUMBER) {
-            if (stats.count > 0) {
-                const percentiles = get(
-                    aggregations,
-                    [...aggsPath, `${id}_percentiles`, 'values'],
-                    []
-                );
-                const medianPercentile: { value: number; key: number } | undefined =
-                    find(percentiles, {
-                        key: 50,
-                    });
-                stats.median =
-                    medianPercentile !== undefined ? medianPercentile!.value : 0;
-                stats.distribution = processDistributionData(
-                    percentiles,
-                    PERCENTILE_SPACING,
-                    stats.min
-                );
-            }
-        }
+        // if (field.type === FIELD_TYPES.NUMBER) {
+        //     if (stats.count > 0) {
+        //         const percentiles = get(
+        //             aggregations,
+        //             [...aggsPath, `${id}_percentiles`, 'values'],
+        //             []
+        //         );
+        //         const medianPercentile: { value: number; key: number } | undefined =
+        //             find(percentiles, {
+        //                 key: 50,
+        //             });
+        //         stats.median =
+        //             medianPercentile !== undefined ? medianPercentile!.value : 0;
+        //         stats.distribution = processDistributionData(
+        //             percentiles,
+        //             PERCENTILE_SPACING,
+        //             stats.min
+        //         );
+        //     }
+        // }
 
         return stats;
     });
@@ -301,7 +301,7 @@ export const getFieldStats = async (
 
     promisses.push(getTotalCount(query, earliest, latest));
 
-    chunk(nonTextFields, 5).forEach((fields) => {
+    chunk(nonTextFields, 3).forEach((fields) => {
         promisses.push(
             getNonTextFieldStats(fields, query, earliest, latest, samplerShardSize)
         );
